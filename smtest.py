@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import scanmonkey
+import fuzzymonkey
 
 def main():
     print 'SkiddieMonkey PoC Front End Tester'
@@ -11,7 +12,9 @@ def main():
     with open (fileName) as f:
         ipList = f.readlines()
     
-    scanmonkey.scanHosts(ipList,int(runtime),dbName)
+    #scanmonkey.scanHosts(ipList,int(runtime),dbName)
+    fuzzymonkey.fuzzPorts(int(runtime),dbName)
+   
 
 
 if __name__ == '__main__':
