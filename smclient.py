@@ -47,10 +47,11 @@ def mainMenu():
             sys.exit()
             
         else:
-            raw_input("Press enter to continue.")
+            raw_input("Invalid selection.  Press enter to continue.")
         
 
 def dbSetup():
+    global options
     print "\n\n"
     print "Database Setup:"
     print "---------------"
@@ -59,6 +60,10 @@ def dbSetup():
     msfDbPass = raw_input("Enter the Metasploit Postgres password: ")
     monkeyDbIp = raw_input("Enter the IP address of the Skiddiemonkey MongoDB instance: ")
     monkeyDbName = raw_input("Enter the name of the Skiddiemonkey Database: ")
+    options['dbip'] = monkeyDbIp
+    options['dbname'] = monkeyDbName
+    
+    
     
     
         
