@@ -2,7 +2,8 @@
 import os
 import sys
 import pymongo
-
+import psycopg2
+import re
 
 
 def main():
@@ -24,10 +25,11 @@ def mainMenu():
         print "                                                                 |___/      "
         print "Skiddiemonkeys v0.01-DEV"
         print "1-Set up the Database"
-        print "2-Define Monkeys"
-        print "3-Unleash the Monkeys!"
-        print "4-See the Monkey Business"
-        print "5-Exit"
+        print "2-Load targets"
+        print "3-Define Monkeys"
+        print "4-Unleash the Monkeys!"
+        print "5-See the Monkey Business"
+        print "6-Exit"
         print "\n"
         selection = raw_input("Select a menu option: ")
         
@@ -35,15 +37,18 @@ def mainMenu():
             dbSetup()
         
         elif selection == "2":
-            defMonkeys()
+            loadTargets()
         
         elif selection == "3":
-            startMonkeys()
+            defMonkeys()
         
         elif selection == "4":
-            monkeyReport()
+            startMonkeys()
             
         elif selection == "5":
+            monkeyReport()
+            
+        elif selection == "6":
             sys.exit()
             
         else:
@@ -62,6 +67,21 @@ def dbSetup():
     monkeyDbName = raw_input("Enter the name of the Skiddiemonkey Database: ")
     options['dbip'] = monkeyDbIp
     options['dbname'] = monkeyDbName
+    
+    #We have to get the module names from the Metasploit DB for the monkeys and map the exploits to port numbers, so the sploit monkeys can
+    #use the scanner monkey's work.
+    
+    try:
+        conn = psycopg2.connect(database='msf3',host=msfDbIp,user=msfDbUser,password=msfDbPass)
+        cur = con.cursor()
+        cur.execute('SELECT file FROM module_details;')
+        
+        for sploit in cur:
+            f = open(sploit[0],"r")
+            portSearch = f.readlines()
+            f.close()
+            
+    
     
     
     
