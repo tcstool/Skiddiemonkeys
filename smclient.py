@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
-import pymongo
+from pymongo import MongoClient
 import psycopg2
 import re
 
@@ -9,7 +9,7 @@ import re
 def main():
     global options
     options = {}
-    print "main"
+    mainMenu()
 
 def mainMenu():
     mmSelect = True
@@ -40,7 +40,7 @@ def mainMenu():
             loadTargets()
         
         elif selection == "3":
-            defMonkeys()
+            makeMonkeys()
         
         elif selection == "4":
             startMonkeys()
@@ -80,15 +80,35 @@ def dbSetup():
             f = open(sploit[0],"r")
             portSearch = f.readlines()
             f.close()
-            
+    except:
+        print "You wreck me baby."  #Placeholder for actually doing useful things
+
+def loadTargets():
+    global options
+    conn = MongoClient(options['dbip'],27017)
+    db = conn[options['dbname']]
     
+    if 'targets' in db.collection_names():
+        if raw_input('Remove current list of targets? ').lower() == 'y':
+            db['targets'].drop()
+
+    else:
+        print 'No targets found in database.'
+
+    fileName = raw_input('Enter path to targets file: ')
+
+    with open(fileName) as f:
+        ipList = f.readlines()
+
+    for target in ipList:
+        db.targets.insert({'ip':target.split(',')[0],'value':target.split(',')[1],'location':target.split(',')[2].lower().rstrip()})
     
-    
-    
-    
-        
-        
+    raw_input('targets loaded! presee enter to return to main menu.')
+    return
+
+def makeMonkeys():
+   print 'making monkeys' 
 
 if __name__ == '__main__':
-	main()
+    main()
 
