@@ -72,31 +72,48 @@ def dbSetup():
     #use the scanner monkey's work.
     
     try:
-        conn = psycopg2.connect(database='msf3',host=msfDbIp,user=msfDbUser,password=msfDbPass)
-        cur = con.cursor()
+        pgConn = psycopg2.connect(database='msf3',host=msfDbIp,user=msfDbUser,password=msfDbPass)
+        cur = pgConn.cursor()
         cur.execute('SELECT file,fullname FROM module_details;')
-        
+        mongoConn = MongoClient(options['dbip'],27017)
+        mongoDb = mongoConn[options['dbname']]
+
+        if 'logins' in mongoDb.collection_names() or 'sploits' in mongoDb.collection_names():
+            if raw_input('Previous exploit data found.  Erase? ').lower() == 'y':
+                if 'logins' in mongoDb.collection_names():
+                    mongoDb['logins'].drop()
+
+                if 'sploits' in mongoDb.collection_names():
+                    mongoDb['sploits'].drop()
+
+
+
         for sploit in cur:
             f = open(sploit[0],"r")
             portSearch = f.readlines()
             f.close()
 	    
-	    for line in portSearch:
-		if "Opt::RPORT" in line:
+        for line in portSearch:
+            if "Opt::RPORT" in line:
 		    
-		    try:
-			regex = '.*\((.*?)\).*'
-			matches = re.search(regex,line)
-			
-			if matches.group(1).isdigit():
-				print sploit[0] #debug
-				print matches.group(1) #debug
+                try:
+                    regex = '.*\((.*?)\).*'
+                    matches = re.search(regex,line)
 
-			else:
-			    continue
+                    if matches.group(1).isdigit():
+                        if 'auxiliary' in sploit[1] and 'scanner' in sploit[1] and  '_login' in sploit[1]:
+                        #If the logic evaluates to True, this is a login module
+                        mongoDb.logins.insert({'modName':sploit[1],'port':matches.group(1)})
 
-		    except:
-			    pass
+                    elif 'exploit' in sploit[1]:
+                        #This is an exploit module
+                        mongoDb.sploits.insert({'modName':sploit[1],'port':matches.group(1)})
+
+                    else:
+                        continue
+
+                except:
+                    pass
 
     except:
         print "You wreck me baby."  #Placeholder for actually doing useful things
@@ -144,49 +161,48 @@ def makeMonkeys():
    validLocs = ['i','e']
    
    for i in range(1,numMonkeys+1):
-	monkeyIQ = None
-	monkeyType = None
-	monkeyLoc = None
-	print 'Setting up monkey #' + str(i)
+    monkeyIQ = None
+    monkeyType = None
+    monkeyLoc = None
+    print 'Setting up monkey #' + str(i)
+
+    while monkeyIQ not in validIQs:
+        print '---------------------'
+        print 'Enter Monkey IQ:'
+        print '0-World\'s #1 Hacker'
+        print '1-CISSP'
+        print '2-CEH'
+        print '3-Security Weekly Listener'
+        monkeyIQ = int(raw_input('Input: '))
+
+    print "\n"
 	
-	while monkeyIQ not in validIQs:
-	    print '---------------------'
-	    print 'Enter Monkey IQ:'
-	    print '0-World\'s #1 Hacker'
-	    print '1-CISSP'
-	    print '2-CEH'
-	    print '3-Security Weekly Listener'
-	    monkeyIQ = int(raw_input('Input: '))
+    while monkeyType not in validTypes:
+        print 'Define Monkey Type:'
+        print '1-Scanner Monkey'
+        print '2-Exploit Monkey'
+        print '3-Fuzzy Monkey'
+        print '4-Login Monkey'
+        print '5-Web Monkey'
+        monkeyType = int(raw_input('Input: '))
 	
-	print "\n"
+    print "\n"
 	
-	while monkeyType not in validTypes:
-	    print 'Define Monkey Type:'
-	    print '1-Scanner Monkey'
-	    print '2-Exploit Monkey'
-	    print '3-Fuzzy Monkey'
-	    print '4-Login Monkey'
-	    print '5-Web Monkey'
-	    monkeyType = int(raw_input('Input: '))
-	
-	print "\n"
-	
-	while monkeyLoc not in validLocs:
-	    print 'Define Monkey Location:'
-	    print 'i-Internal'
-	    print 'e-External'
-	    monkeyLoc = raw_input('Input: ').lower()
-	    
-	monkeyIp = raw_input('Enter IP address of monkey server: ')
-	
-	try:
-	   db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp})
-	   print 'Monkey Created!'
-	
-	except:
-	    print 'Failed to create monkey in database.'
-	
-	
+    while monkeyLoc not in validLocs:
+        print 'Define Monkey Location:'
+        print 'i-Internal'
+        print 'e-External'
+        monkeyLoc = raw_input('Input: ').lower()
+
+    monkeyIp = raw_input('Enter IP address of monkey server: ')
+
+    try:
+        db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp})
+        print 'Monkey Created!'
+
+    except:
+        print 'Failed to create monkey in database.'
+
    raw_input('Finished making monkeys.  Press enter to return to the main menu.')
    return
 
