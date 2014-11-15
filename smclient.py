@@ -103,11 +103,74 @@ def loadTargets():
     for target in ipList:
         db.targets.insert({'ip':target.split(',')[0],'value':target.split(',')[1],'location':target.split(',')[2].lower().rstrip()})
     
-    raw_input('targets loaded! presee enter to return to main menu.')
+    raw_input('targets loaded! press enter to return to main menu.')
     return
 
 def makeMonkeys():
-   print 'making monkeys' 
+   global options
+   print 'Monkey setup'
+   print '------------'
+   conn = MongoClient(options['dbip'],27017)
+   db = conn[options['dbname']]
+
+   if 'monkeys' in db.collection_names():
+        if raw_input('Existing monkeys found.  Remove?').lower() == 'y':
+             db['monkeys'].drop()
+
+   else:
+      print 'No monkeys found in database.'
+      
+   numMonkeys = int(raw_input('Enter total numer of monkeys to create: '))
+   validIQs = [0,1,2,3]
+   validTypes = [1,2,3,4]
+   validLocs = ['i','e']
+   
+   for i in range(1,numMonkeys+1):
+	monkeyIQ = None
+	monkeyType = None
+	monkeyLoc = None
+	print 'Setting up monkey #' + str(i)
+	
+	while monkeyIQ not in validIQs:
+	    print '---------------------'
+	    print 'Enter Monkey IQ:'
+	    print '0-World\'s #1 Hacker'
+	    print '1-CISSP'
+	    print '2-CEH'
+	    print '3-Security Weekly Listener'
+	    monkeyIQ = int(raw_input('Input: '))
+	
+	print "\n"
+	
+	while monkeyType not in validTypes:
+	    print 'Define Monkey Type:'
+	    print '1-Scanner Monkey'
+	    print '2-Exploit Monkey'
+	    print '3-Fuzzy Monkey'
+	    print '4-Login Monkey'
+	    print '5-Web Monkey'
+	    monkeyType = int(raw_input('Input: '))
+	
+	print "\n"
+	
+	while monkeyLoc not in validLocs:
+	    print 'Define Monkey Location:'
+	    print 'i-Internal'
+	    print 'e-External'
+	    monkeyLoc = raw_input('Input: ').lower()
+	    
+	monkeyIp = raw_input('Enter IP address of monkey server: ')
+	
+	try:
+	   db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp})
+	   print 'Monkey Created!'
+	
+	except:
+	    print 'Failed to create monkey in database.'
+	
+	
+   raw_input('Finished making monkeys.  Press enter to return to the main menu.')
+   return
 
 if __name__ == '__main__':
     main()
