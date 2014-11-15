@@ -74,12 +74,30 @@ def dbSetup():
     try:
         conn = psycopg2.connect(database='msf3',host=msfDbIp,user=msfDbUser,password=msfDbPass)
         cur = con.cursor()
-        cur.execute('SELECT file FROM module_details;')
+        cur.execute('SELECT file,fullname FROM module_details;')
         
         for sploit in cur:
             f = open(sploit[0],"r")
             portSearch = f.readlines()
             f.close()
+	    
+	    for line in portSearch:
+		if "Opt::RPORT" in line:
+		    
+		    try:
+			regex = '.*\((.*?)\).*'
+			matches = re.search(regex,line)
+			
+			if matches.group(1).isdigit():
+				print sploit[0] #debug
+				print matches.group(1) #debug
+
+			else:
+			    continue
+
+		    except:
+			    pass
+
     except:
         print "You wreck me baby."  #Placeholder for actually doing useful things
 
