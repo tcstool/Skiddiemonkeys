@@ -138,7 +138,7 @@ def dbSetup():
                             pass
 
         except Exception,e:
-            print 'Data not imported.  Check your MongoDB and Postgres settings. '  #Placeholder for actually doing useful things
+            raw_input('Data not imported.  Check your MongoDB and Postgres settings. ')
             return
 
     raw_input('Database load complete! Press enter to return to the main menu.')
