@@ -26,111 +26,123 @@ def main():
     mainMenu()
 
 def mainMenu():
-    mmSelect = True
-    
-    while mmSelect:
+    mmValid = [1,2,3,4,5,6]
+    selection = '99'
+    while int(selection) not in mmValid:
         os.system('clear')
-        print "     | |  (_)   | |   | (_)                            | |                 "
-        print "  ___| | ___  __| | __| |_  ___   _ __ ___   ___  _ __ | | _____ _   _ ___ "
-        print " / __| |/ / |/ _` |/ _` | |/ _ \ | '_ ` _ \ / _ \| '_ \| |/ / _ \ | | / __|"
+        print '     | |  (_)   | |   | (_)                            | |                 '
+        print '  ___| | ___  __| | __| |_  ___   _ __ ___   ___  _ __ | | _____ _   _ ___ '
+        print ' / __| |/ / |/ _` |/ _` | |/ _ \ | \'_ \` _ \ / _ \| \'_ \| |/ / _ \ | | / __|'
         print ' \\__ \\   <| | (_| | (_| | |  __/ | | | | | | (_) | | | |   <  __/ |_| \\__ \\'
-        print " |___/_|\_\_|\__,_|\__,_|_|\___| |_| |_| |_|\___/|_| |_|_|\_\___|\__, |___/"
-        print "                                                                 __/  |     "
-        print "                                                                 |___/      "
-        print "Skiddiemonkeys v0.01-DEV"
-        print "1-Set up the Database"
-        print "2-Load targets"
-        print "3-Define Monkeys"
-        print "4-Unleash the Monkeys!"
-        print "5-See the Monkey Business"
-        print "6-Exit"
-        print "\n"
-        selection = raw_input("Select a menu option: ")
+        print ' |___/_|\_\_|\__,_|\__,_|_|\___| |_| |_| |_|\___/|_| |_|_|\_\___|\__, |___/'
+        print '                                                                 __/  |     '
+        print '                                                                 |___/      '
+        print 'Skiddiemonkeys v0.01-DEV'
+        print '1-Set up the Database'
+        print '2-Load targets'
+        print '3-Define Monkeys'
+        print '4-Unleash the Monkeys!'
+        print '5-See the Monkey Business'
+        print '6-Exit'
+        print '\n'
+        selection = raw_input('Select a menu option: ')
         
-        if selection == "1":
+        if selection == '1':
+            selection = '99'
             dbSetup()
         
-        elif selection == "2":
+        elif selection == '2':
+            selection = '99'
             loadTargets()
         
-        elif selection == "3":
+        elif selection == '3':
+            selection = '99'
             makeMonkeys()
         
-        elif selection == "4":
+        elif selection == '4':
+            selection = '99'
             startMonkeys()
             
-        elif selection == "5":
+        elif selection == '5':
+            selection = '99'
             monkeyReport()
             
-        elif selection == "6":
+        elif selection == '6':
             sys.exit()
             
         else:
-            raw_input("Invalid selection.  Press enter to continue.")
+            raw_input('Invalid selection.  Press enter to continue.')
         
 
 def dbSetup():
     global options
-    print "\n\n"
-    print "Database Setup:"
-    print "---------------"
-    msfDbIp = raw_input("Enter the IP address of the Metasploit Postgres instance: ")
-    msfDbUser = raw_input("Enter the Metasploit Postgres username: ")
-    msfDbPass = raw_input("Enter the Metasploit Postgres password: ")
-    monkeyDbIp = raw_input("Enter the IP address of the Skiddiemonkey MongoDB instance: ")
-    monkeyDbName = raw_input("Enter the name of the Skiddiemonkey Database: ")
+    print '\n\n'
+    print 'Database Setup:'
+    print '---------------'
+    monkeyDbIp = raw_input('Enter the IP address of the Skiddiemonkeys MongoDB instance: ')
+    monkeyDbName = raw_input('Enter the name of the Skiddiemonkey Database: ')
     options['dbip'] = monkeyDbIp
     options['dbname'] = monkeyDbName
-    
+
+
+    if raw_input('Do you want to import Metasploit modules for exploit monkeys to use? ').lower() == 'y':
+        msfDbIp = raw_input('Enter the IP address of the Metasploit Postgres instance: ')
+        msfDbUser = raw_input('Enter the Metasploit Postgres username: ')
+        msfDbPass = raw_input('Enter the Metasploit Postgres password: ')
+        msfDbName = raw_input('Enter the Metasploit Postgres DB name: ')
+
     #We have to get the module names from the Metasploit DB for the monkeys and map the exploits to port numbers, so the sploit monkeys can
     #use the scanner monkey's work.
     
-    try:
-        pgConn = psycopg2.connect(database='msf3',host=msfDbIp,user=msfDbUser,password=msfDbPass)
-        cur = pgConn.cursor()
-        cur.execute('SELECT file,fullname FROM module_details;')
-        mongoConn = MongoClient(options['dbip'],27017)
-        mongoDb = mongoConn[options['dbname']]
+        try:
+            pgConn = psycopg2.connect(database=msfDbName,host=msfDbIp,user=msfDbUser,password=msfDbPass)
+            cur = pgConn.cursor()
+            cur.execute('SELECT file,fullname FROM module_details;')
+            mongoConn = MongoClient(options['dbip'],27017)
+            mongoDb = mongoConn[options['dbname']]
 
-        if 'logins' in mongoDb.collection_names() or 'sploits' in mongoDb.collection_names():
-            if raw_input('Previous exploit data found.  Erase? ').lower() == 'y':
-                if 'logins' in mongoDb.collection_names():
-                    mongoDb['logins'].drop()
+            if 'logins' in mongoDb.collection_names() or 'sploits' in mongoDb.collection_names():
+                if raw_input('Previous exploit data found.  Erase? ').lower() == 'y':
+                    if 'logins' in mongoDb.collection_names():
+                        mongoDb['logins'].drop()
 
-                if 'sploits' in mongoDb.collection_names():
-                    mongoDb['sploits'].drop()
+                    if 'sploits' in mongoDb.collection_names():
+                        mongoDb['sploits'].drop()
 
-
-
-        for sploit in cur:
-            f = open(sploit[0],"r")
-            portSearch = f.readlines()
-            f.close()
+            print 'Opening exploits and getting default port numbers...'
+            for sploit in cur:
+                f = open(sploit[0],"r")
+                portSearch = f.readlines()
+                f.close()
 	    
-        for line in portSearch:
-            if "Opt::RPORT" in line:
+                for line in portSearch:
+                    if "Opt::RPORT" in line:
 		    
-                try:
-                    regex = '.*\((.*?)\).*'
-                    matches = re.search(regex,line)
+                        try:
+                            regex = '.*\((.*?)\).*'
+                            matches = re.search(regex,line)
 
-                    if matches.group(1).isdigit():
-                        if 'auxiliary' in sploit[1] and 'scanner' in sploit[1] and  '_login' in sploit[1]:
-                        #If the logic evaluates to True, this is a login module
-                        mongoDb.logins.insert({'modName':sploit[1],'port':matches.group(1)})
+                            if matches.group(1).isdigit():
+                                if 'auxiliary' in sploit[1] and 'scanner' in sploit[1] and  '_login' in sploit[1]:
+                                    #If the logic evaluates to True, this is a login module
+                                    mongoDb.logins.insert({'modName':sploit[1],'port':matches.group(1)})
 
-                    elif 'exploit' in sploit[1]:
-                        #This is an exploit module
-                        mongoDb.sploits.insert({'modName':sploit[1],'port':matches.group(1)})
+                                elif 'exploit' in sploit[1]:
+                                    #This is an exploit module
+                                    mongoDb.sploits.insert({'modName':sploit[1],'port':matches.group(1)})
 
-                    else:
-                        continue
+                            else:
+                                continue
 
-                except:
-                    pass
+                        except:
+                            pass
 
-    except:
-        print "You wreck me baby."  #Placeholder for actually doing useful things
+        except Exception,e:
+            print 'Data not imported.  Check your MongoDB and Postgres settings. '  #Placeholder for actually doing useful things
+            return
+
+    raw_input('Database load complete! Press enter to return to the main menu.')
+    return
 
 def loadTargets():
     global options
@@ -210,8 +222,18 @@ def makeMonkeys():
 
     monkeyIp = raw_input('Enter IP address of monkey server: ')
 
+    #Deal with fuzzy monkeys who need an extra option
+    if monkeyType == 3:
+        minFuzzSize = int(raw_input('Enter the minimum number of bytes of fuzz data to send: '))
+        maxFuzzSize = int(raw_input('Enter the maximum number of bytes of fuzz data to send: '))
+
     try:
-        db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp})
+        if monkeyType == 3:
+            db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp,'min':minFuzzSize,'max':maxFuzzSize})
+
+        else:
+            db.monkeys.insert({'iq':monkeyIQ,'type':monkeyType,'location':monkeyLoc,'ip':monkeyIp})
+
         print 'Monkey Created!'
 
     except:
