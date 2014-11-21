@@ -32,19 +32,26 @@ def startServer():
         s.bind(('',7433))
     
     except socket.error,e:
-        print 'Failed to start listener.  Error code ' + str(e[0]) + 'Error message ' + str(e[1])
+        print 'Failed to start listener.  Error code ' + str(e[0]) + ' Error message ' + str(e[1])
         sys.exit()
     
     s.listen(20)
     print 'Monkey is ready for work!'
+
+    while 1:
+        conn, addr = s.accept()
+        print 'Skiddiemonkey Client at ' + addr[0] + ' connected.'
+        start_new_thread(acceptWork,(conn,))
+
     
 def acceptWork(conn):
     conn.send('Monkey is listening.')
     
     while True:
         work = conn.recv(1024)
-        reply = 'OK'
-        
+
+        print work #debug
+
         if not work:
             break
         
@@ -52,10 +59,6 @@ def acceptWork(conn):
         
         if jobDetails[0] == 'scan':
             scanmonkey.scanHosts()
-        
-        
-        conn.sendall(reply)
-        
     
     conn.close()
 

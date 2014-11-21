@@ -18,11 +18,12 @@ import nmap
 import time
 from random import randint
 
-def scanHosts(hostList,runTime,dbName,monkeyId):
+def scanHosts(runTime,dbIp,dbName,monkeyIq):
     timeout = time.time() + 60 * runTime
     
     while True:
         time.sleep(1)
+
         openPorts = [] #reinit each time through loop
         if time.time() > timeout:
             break
@@ -42,8 +43,8 @@ def scanHosts(hostList,runTime,dbName,monkeyId):
             if len(openPorts) != 0:        
                 saveResults(nm.all_hosts()[0],openPorts,dbName,start,end)
     
-def saveResults(target,openPorts,dbName,startTime,endTime): 
-    conn = MongoClient('127.0.0.1',27017) #default mongoDB security for PoC
+def saveResults(target,openPorts,dbIp,dbName,startTime,endTime):
+    conn = MongoClient(dbIp,27017) #default mongoDB security for PoC
     data = {'ip':target,'ports':openPorts}
     db = conn[dbName]
     hosts = db.hosts

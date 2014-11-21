@@ -18,6 +18,7 @@ import sys
 from pymongo import MongoClient
 import psycopg2
 import re
+import socket
 
 
 def main():
@@ -241,6 +242,45 @@ def makeMonkeys():
 
    raw_input('Finished making monkeys.  Press enter to return to the main menu.')
    return
+
+def startMonkeys():
+    global options
+    conn = MongoClient(options['dbip'],27017)
+    db = conn[options['dbname']]
+    runTime = raw_input('How long should the monkeys be loose? ')
+    print 'Fly my pretties, fly!'
+
+    for monkey in db.monkeys.find():
+    #Get each monkey from the database and transmit instructions to the server
+
+        if monkey['type'] == 3:
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.connect(monkey['ip'],7433)
+                    work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + runTime + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['min']) + ',' + str(monkey['max'])
+                    s.send(work)
+                    s.close()
+
+                except Exception,e:
+                    print e #debug
+                    print 'Error: Couldn\'t connect to monkey at ' + monkey['ip']
+                    continue
+
+        else:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(monkey['ip'])
+                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + runTime + ',' + options['dbname'] + ',' + options['dbip']
+                s.send(work)
+                s.close()
+
+            except Exception,e:
+                print e #debug
+                print 'Error: Couldn\'t connect to monkey at ' + monkey['ip']
+                continue
+
+def monkeyReport():
+    print 'Damage report, Mr. Scott'
 
 if __name__ == '__main__':
     main()
