@@ -40,7 +40,7 @@ def startServer():
 
     while 1:
         conn, addr = s.accept()
-        print 'Skiddiemonkey Client at ' + addr[0] + ' connected.'
+        print 'Skiddiemonkey client at ' + addr[0] + ' connected.'
         start_new_thread(acceptWork,(conn,))
 
     
@@ -50,15 +50,13 @@ def acceptWork(conn):
     while True:
         work = conn.recv(1024)
 
-        print work #debug
-
         if not work:
             break
         
         jobDetails = work.split(',')
-        
-        if jobDetails[0] == 'scan':
-            scanmonkey.scanHosts()
+
+        if jobDetails[0] == '1':
+            scanmonkey.scanHosts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2])
     
     conn.close()
 

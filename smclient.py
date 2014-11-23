@@ -253,7 +253,7 @@ def startMonkeys():
     for monkey in db.monkeys.find():
     #Get each monkey from the database and transmit instructions to the server
 
-        if monkey['type'] == 3:
+        if monkey['type'] == 3:  #Fuzzy monkeys require extra attributes
                 try:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.connect(monkey['ip'],7433)
@@ -269,8 +269,8 @@ def startMonkeys():
         else:
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(monkey['ip'])
-                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + runTime + ',' + options['dbname'] + ',' + options['dbip']
+                s.connect((monkey['ip'],7433))
+                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] +',' + runTime + ',' + options['dbname'] + ',' + options['dbip']
                 s.send(work)
                 s.close()
 
