@@ -72,6 +72,7 @@ def mainMenu():
             sys.exit()
             
         else:
+            selection = '99'
             raw_input('Invalid selection.  Press enter to continue.')
         
 

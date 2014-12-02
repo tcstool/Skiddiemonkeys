@@ -22,33 +22,37 @@ import string
 
 
 
-def fuzzPorts(runTime,dbName,monkeyId):
+def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData):
     timeout = time.time() + 60 * runTime
-    conn = MongoClient('127.0.0.1',27017)
-    db = conn[dbName]
-    hosts = db.hosts
-    
+
     while True:
         targets = [] #reinit each time through
+
         time.sleep(1)
+
         
         if time.time() > timeout:
             break
+
+        conn = MongoClient(dbIp,27017)
+        db = conn[dbName]
+        hosts = db.hosts
+
         
         start = time.ctime()
         
-        if hosts.find().count() == 0:
+        if hosts.find({'location':monkeyLoc}).count() == 0:
             print 'Fuzzy monkey is waiting for work.  Eating bananas.  Will check again in 10 seconds.'
             time.sleep(10)
         
         else:
-            for work in hosts.find():
+            for work in hosts.find({'location':monkeyLoc}):
                 targets.append(work)
 
             index = randint(0,len(targets)-1)
             fuzzIP = str(targets[index]['ip'])
             fuzzTCP = str(targets[index]['ports'][randint(0,len(targets[index]['ports'])-1)])
-            fuzzData = genFuzzData(randint(1,100000))
+            fuzzData = genFuzzData(randint(int(minData),int(maxData)))
             print 'Fuzzy monkey got work! Fuzzing ' + fuzzIP + ' on port ' + fuzzTCP + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
             
             start = time.ctime()
