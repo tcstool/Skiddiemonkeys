@@ -18,7 +18,7 @@ import nmap
 import time
 from random import randint
 
-def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc):
+def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
     
     while True:
@@ -50,19 +50,19 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc):
                     openPorts.append(port)
              
             if len(openPorts) != 0:        
-                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,conn)
+                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,conn,monkeyId)
 
     return
     
-def saveResults(target,openPorts,dbName,startTime,endTime,conn):
+def saveResults(target,openPorts,dbName,startTime,endTime,conn,monkeyId):
     db = conn[dbName]
     data = {'ip':target,'ports':openPorts}
     hosts = db.hosts
-    action = db.action
+    action = db.actions
     
     if hosts.find({'ip' : target}).count() == 0:  #If the IP already exists in the database skip recording duplicate data
         hosts.insert(data)
     
-    action.insert({'action':'synscan','ip':target,'start':startTime,'end':endTime}) #Record all monkey activity, even if it's already occurred (i.e.Same target gets hit more than once)
+    action.insert({'action':'synscan','ip':target,'start':startTime,'end':endTime,'id':monkeyId}) #Record all monkey activity, even if it's already occurred (i.e.Same target gets hit more than once)
     
     

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#skiddiemonkeys Copyright 2014 Russell Butturini
+# skiddiemonkeys Copyright 2014 Russell Butturini
 #This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 #the Free Software Foundation, either version 3 of the License, or
@@ -24,12 +24,14 @@ import socket
 def main():
     global options
     options = {}
-    options['CLI']='true'
+    options['CLI'] = 'true'
     mainMenu()
 
+
 def mainMenu():
-    mmValid = [1,2,3,4,5,6]
+    mmValid = [1, 2, 3, 4, 5, 6]
     selection = '99'
+
     while int(selection) not in mmValid:
         os.system('clear')
         print '     | |  (_)   | |   | (_)                            | |                 '
@@ -48,34 +50,34 @@ def mainMenu():
         print '6-Exit'
         print '\n'
         selection = raw_input('Select a menu option: ')
-        
+
         if selection == '1':
             selection = '99'
             dbSetup()
-        
+
         elif selection == '2':
             selection = '99'
             loadTargets()
-        
+
         elif selection == '3':
             selection = '99'
             makeMonkeys()
-        
+
         elif selection == '4':
             selection = '99'
             startMonkeys()
-            
+
         elif selection == '5':
             selection = '99'
             monkeyReport()
-            
+
         elif selection == '6':
             sys.exit()
-            
+
         else:
             selection = '99'
             raw_input('Invalid selection.  Press enter to continue.')
-        
+
 
 def dbSetup():
     global options
@@ -87,27 +89,29 @@ def dbSetup():
     options['dbip'] = monkeyDbIp
     options['dbname'] = monkeyDbName
 
-
     if raw_input('Do you want to import Metasploit modules for exploit monkeys to use? ').lower() == 'y':
         msfDbIp = raw_input('Enter the IP address of the Metasploit Postgres instance: ')
         msfDbUser = raw_input('Enter the Metasploit Postgres username: ')
         msfDbPass = raw_input('Enter the Metasploit Postgres password: ')
         msfDbName = raw_input('Enter the Metasploit Postgres DB name: ')
-        dbLoadModules(options,msfDbIp,msfDbUser,msfDbPass,msfDbName)
+        dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName)
     raw_input('Database load complete! Press enter to return to the main menu.')
     return
     #We have to get the module names from the Metasploit DB for the monkeys and map the exploits to port numbers, so the sploit monkeys can
     #use the scanner monkey's work.
+
+
 def dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName):
     try:
-        pgConn = psycopg2.connect(database=msfDbName,host=msfDbIp,user=msfDbUser,password=msfDbPass)
+        pgConn = psycopg2.connect(database=msfDbName, host=msfDbIp, user=msfDbUser, password=msfDbPass)
         cur = pgConn.cursor()
         cur.execute('SELECT file,fullname FROM module_details;')
-        mongoConn = MongoClient(options['dbip'],27017)
+        mongoConn = MongoClient(options['dbip'], 27017)
         mongoDb = mongoConn[options['dbname']]
 
         if 'logins' in mongoDb.collection_names() or 'sploits' in mongoDb.collection_names():
-            if (options['CLI']=='true' and raw_input('Previous exploit data found.  Erase? ').lower() == 'y') or (options['CLI']=='false' and options['eraseSploitData']=='true'):
+            if (options['CLI'] == 'true' and raw_input('Previous exploit data found.  Erase? ').lower() == 'y') or (
+                            options['CLI'] == 'false' and options['eraseSploitData'] == 'true'):
                 if 'logins' in mongoDb.collection_names():
                     mongoDb['logins'].drop()
 
@@ -116,25 +120,25 @@ def dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName):
 
         print 'Opening exploits and getting default port numbers...'
         for sploit in cur:
-            f = open(sploit[0],"r")
+            f = open(sploit[0], "r")
             portSearch = f.readlines()
             f.close()
 
             for line in portSearch:
                 if "Opt::RPORT" in line:
-		    
+
                     try:
                         regex = '.*\((.*?)\).*'
-                        matches = re.search(regex,line)
+                        matches = re.search(regex, line)
 
                         if matches.group(1).isdigit():
-                            if 'auxiliary' in sploit[1] and 'scanner' in sploit[1] and  '_login' in sploit[1]:
+                            if 'auxiliary' in sploit[1] and 'scanner' in sploit[1] and '_login' in sploit[1]:
                                 #If the logic evaluates to True, this is a login module
-                                mongoDb.logins.insert({'modName':sploit[1],'port':matches.group(1)})
+                                mongoDb.logins.insert({'modName': sploit[1], 'port': matches.group(1)})
 
                             elif 'exploit' in sploit[1]:
                                 #This is an exploit module
-                                mongoDb.sploits.insert({'modName':sploit[1],'port':matches.group(1)})
+                                mongoDb.sploits.insert({'modName': sploit[1], 'port': matches.group(1)})
 
                         else:
                             continue
@@ -142,17 +146,17 @@ def dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName):
                     except:
                         pass
 
-    except Exception,e:
-        if options['CLI']=='true':
+    except Exception, e:
+        if options['CLI'] == 'true':
             raw_input('Data not imported.  Check your MongoDB and Postgres settings. ')
         return
 
 
 def loadTargets():
     global options
-    conn = MongoClient(options['dbip'],27017)
+    conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
-    
+
     if 'targets' in db.collection_names():
         if raw_input('Remove current list of targets? ').lower() == 'y':
             db['targets'].drop()
@@ -162,48 +166,49 @@ def loadTargets():
 
     fileName = raw_input('Enter path to targets file: ')
 
-    loadTargetsParam(options,fileName,db)
+    loadTargetsParam(options, fileName, db)
     raw_input('targets loaded! press enter to return to main menu.')
     return
 
+
 def loadTargetsParam(options, fileName, db):
-    if options['CLI']=='false' and options['eraseTargetsData']=='true':
+    if options['CLI'] == 'false' and options['eraseTargetsData'] == 'true':
         db['targets'].drop()
 
     with open(fileName) as f:
         ipList = f.readlines()
 
     for target in ipList:
-        db.targets.insert({'ip':target.split(',')[0],'value':target.split(',')[1],'location':target.split(',')[2].lower().rstrip()})
-
+        db.targets.insert({'ip': target.split(',')[0], 'value': target.split(',')[1],
+                           'location': target.split(',')[2].lower().rstrip()})
 
 
 def makeMonkeys():
     global options
     print 'Monkey setup'
     print '------------'
-    conn = MongoClient(options['dbip'],27017)
+    conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
 
     if 'monkeys' in db.collection_names():
         if raw_input('Existing monkeys found.  Remove?').lower() == 'y':
-             db['monkeys'].drop()
+            db['monkeys'].drop()
 
     else:
         print 'No monkeys found in database.'
-      
-    numMonkeys = int(raw_input('Enter total number of monkeys to create: '))
-    validIQs = [0,1,2,3]
-    validTypes = [1,2,3,4]
-    validLocs = ['i','e']
 
-    monkeyIQ={}
-    monkeyType={}
-    monkeyLoc={}
-    monkeyIp={}
-    minFuzzSize={}
-    maxFuzzSize={}
-    for i in range(1,numMonkeys+1):
+    numMonkeys = int(raw_input('Enter total number of monkeys to create: '))
+    validIQs = [0, 1, 2, 3]
+    validTypes = [1, 2, 3, 4]
+    validLocs = ['i', 'e']
+
+    monkeyIQ = {}
+    monkeyType = {}
+    monkeyLoc = {}
+    monkeyIp = {}
+    minFuzzSize = {}
+    maxFuzzSize = {}
+    for i in range(1, numMonkeys + 1):
         monkeyIQ[i] = None
         monkeyType[i] = None
         monkeyLoc[i] = None
@@ -219,7 +224,7 @@ def makeMonkeys():
             monkeyIQ[i] = int(raw_input('Input: '))
 
         print "\n"
-	
+
         while monkeyType[i] not in validTypes:
             print 'Define Monkey Type:'
             print '1-Scanner Monkey'
@@ -228,9 +233,9 @@ def makeMonkeys():
             print '4-Login Monkey'
             print '5-Web Monkey'
             monkeyType[i] = int(raw_input('Input: '))
-	
+
         print "\n"
-	
+
         while monkeyLoc[i] not in validLocs:
             print 'Define Monkey Location:'
             print 'i-Internal'
@@ -244,24 +249,29 @@ def makeMonkeys():
             minFuzzSize[i] = int(raw_input('Enter the minimum number of bytes of fuzz data to send: '))
             maxFuzzSize[i] = int(raw_input('Enter the maximum number of bytes of fuzz data to send: '))
 
-    loadMonkeys(options,db,monkeyIQ,monkeyType,monkeyLoc,monkeyIp,minFuzzSize,maxFuzzSize)
+    loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize)
     raw_input('Finished making monkeys.  Press enter to return to the main menu.')
     return
 
-def loadMonkeys(options,db,monkeyIQ,monkeyType,monkeyLoc,monkeyIp,minFuzzSize,maxFuzzSize):
+
+def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize):
     #Get in that barrel!
-    if options['CLI']=='false' and options['eraseMonkeyData']=='true':
+    if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
-    count=1
+    count = 1
+
     for i in monkeyIQ:
         try:
             if monkeyType[i] == 3:
-                db.monkeys.insert({'iq':monkeyIQ[i],'type':monkeyType[i],'location':monkeyLoc[i],'ip':monkeyIp[i],'min':minFuzzSize[i],'max':maxFuzzSize[i]})
+                db.monkeys.insert(
+                    {'id': count, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i], 'ip': monkeyIp[i],
+                     'min': minFuzzSize[i], 'max': maxFuzzSize[i]})
 
             else:
-                db.monkeys.insert({'iq':monkeyIQ[i],'type':monkeyType[i],'location':monkeyLoc[i],'ip':monkeyIp[i]})
+                db.monkeys.insert({'id': count, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i],
+                                   'ip': monkeyIp[i]})
 
-            print 'Monkey',count,'Created!'
+            print 'Monkey', count, 'Created!'
             count += 1
 
         except:
@@ -270,44 +280,80 @@ def loadMonkeys(options,db,monkeyIQ,monkeyType,monkeyLoc,monkeyIp,minFuzzSize,ma
 
 def startMonkeys():
     global options
-    conn = MongoClient(options['dbip'],27017)
+    conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
     options['runTime'] = raw_input('How long should the monkeys be loose? ')
     print 'Fly my pretties, fly!'
-    startMonkeys(options,db)
+    startMonkeysParam(options, db)
 
-def startMonkeysParam(options,db):
+
+def startMonkeysParam(options, db):
     for monkey in db.monkeys.find():
-    #Get each monkey from the database and transmit instructions to the server
+        #Get each monkey from the database and transmit instructions to the server
 
-        if monkey['type'] == 3:  #Fuzzy monkeys require extra attributes
-                try:
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.connect(monkey['ip'],7433)
-                    work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options['runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['min']) + ',' + str(monkey['max'])
-                    s.send(work)
-                    s.close()
+        if monkey['type'] == 3:  #Fuzzy monkeys require extra instructions
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(monkey['ip'], 7433)
+                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
+                    'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['min']) + ',' + str(
+                    monkey['max']) + str(monkey['id'])
+                s.send(work)
+                s.close()
 
-                except Exception,e:
-                    print e #debug
-                    print 'Error: Couldn\'t connect to monkey at ' + monkey['ip']
-                    continue
+            except Exception, e:
+                print e  #debug
+                print 'Error: Couldn\'t connect to monkey at ' + monkey['ip']
+                continue
 
         else:
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((monkey['ip'],7433))
-                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] +',' + options['runTime'] + ',' + options['dbname'] + ',' + options['dbip']
+                s.connect((monkey['ip'], 7433))
+                work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
+                    'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + str(monkey['id'])
                 s.send(work)
                 s.close()
 
-            except Exception,e:
-                print e #debug
+            except Exception, e:
+                print e  #debug
                 print 'Error: Couldn\'t connect to monkey at ' + monkey['ip']
                 continue
 
+
 def monkeyReport():
-    print 'Damage report, Mr. Scott'
+    global options
+    conn = MongoClient(options['dbip'],27017)
+    db = conn[options['dbname']]
+
+    print 'Monkeys clocking out'
+    print '===================='
+
+    validTypes = [1, 2]
+    print 'Select format for output:'
+    print '1-CSV'
+    print '2-HTML'
+    outType = int(raw_input('Input: '))
+
+    if outType not in validTypes:
+        raw_input('Invalid output selection.  Press enter to return.')
+
+    else:
+        savePath = raw_input('Enter file name to save: ')
+
+        try:
+            fo = open(savePath, 'wb')
+
+            if outType == 1:  #Write CSV header row
+                fo.write('action,attacker,target,starttime,endtime\n')
+
+            for event in db.actions.find(): # loop through events
+                if outType == 1:
+                    fo.write(event['action']+','+db.monkeys.find_one({'id':event['id']})['ip']+','+event['target']+','+event['start']+','+event['end']+'\n')
+
+        except:
+            raw_input('Something went wrong writing the output.  Press enter to return')
+
 
 if __name__ == '__main__':
     main()

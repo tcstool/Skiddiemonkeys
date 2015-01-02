@@ -56,10 +56,10 @@ def acceptWork(conn):
         jobDetails = work.split(',')
 
         if jobDetails[0] == '1':
-            scanmonkey.scanHosts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2])
+            scanmonkey.scanHosts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],int(jobDetails[6]))
 
         elif jobDetails[0] == '3':
-            fuzzymonkey.fuzzPorts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],jobDetails[6],jobDetails[7])
+            fuzzymonkey.fuzzPorts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],jobDetails[6],jobDetails[7],int(jobDetails[8]))
     
     conn.close()
 
