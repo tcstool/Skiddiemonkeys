@@ -347,11 +347,12 @@ def monkeyReport():
             if outType == 1:  #Write CSV header row
                 fo.write('action,attacker,target,starttime,endtime\n')
 
-            for event in db.actions.find(): # loop through events
+            for event in db.action.find(): # loop through events
                 if outType == 1:
-                    fo.write(event['action']+','+db.monkeys.find_one({'id':event['id']})['ip']+','+event['target']+','+event['start']+','+event['end']+'\n')
+                    fo.write(event['action']+','+str(db.monkeys.find_one({'id':str(event['id'])})['id'])+','+event['target']+','+event['start']+','+event['end']+'\n')
 
-        except:
+        except Exception,e:  #debug
+            print e #debug
             raw_input('Something went wrong writing the output.  Press enter to return')
 
 
