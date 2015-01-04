@@ -19,11 +19,14 @@ from pymongo import MongoClient
 import psycopg2
 import re
 import socket
+from random import randint
 
 
 def main():
     global options
+    global monkeyIds
     options = {}
+    monkeyIds = []
     options['CLI'] = 'true'
     mainMenu()
 
@@ -185,14 +188,21 @@ def loadTargetsParam(options, fileName, db):
 
 def makeMonkeys():
     global options
+    global monkeyIds
     print 'Monkey setup'
     print '------------'
     conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
 
     if 'monkeys' in db.collection_names():
+
         if raw_input('Existing monkeys found.  Remove?').lower() == 'y':
             db['monkeys'].drop()
+
+        else:
+            #Get the IDs of the existing monkeys to avoid dupes
+            for monkey in db.monkeys.find():
+                monkeyIds.append(monkey['id'])
 
     else:
         print 'No monkeys found in database.'
@@ -255,6 +265,8 @@ def makeMonkeys():
 
 
 def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize):
+    randId = None
+    global monkeyIds
     #Get in that barrel!
     if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
@@ -262,14 +274,22 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
 
     for i in monkeyIQ:
         try:
+            #generate random monkey identifier
+            while randId not in monkeyIds:
+                randId = randint(1,1000000)
+                monkeyIds.append(randId)
+
+
             if monkeyType[i] == 3:
                 db.monkeys.insert(
-                    {'id': count, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i], 'ip': monkeyIp[i],
+                    {'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i], 'ip': monkeyIp[i],
                      'min': minFuzzSize[i], 'max': maxFuzzSize[i]})
+                randId = None
 
             else:
-                db.monkeys.insert({'id': count, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i],
+                db.monkeys.insert({'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i],
                                    'ip': monkeyIp[i]})
+                randId = None
 
             print 'Monkey', count, 'Created!'
             count += 1

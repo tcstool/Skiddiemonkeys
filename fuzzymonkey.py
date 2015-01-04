@@ -22,7 +22,7 @@ import string
 
 
 
-def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData):
+def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
     timeout = time.time() + 60 * runTime
 
     while True:
@@ -62,13 +62,13 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData):
             result = s.recv(100) #don't care what we get back.  Just want to not look suspect by not receiving the data before killing the socket.
             s.close()
             end = time.ctime()
-            saveResults(db,hosts,fuzzIP,fuzzTCP,str(getsizeof(fuzzData)),start,end)
+            saveResults(db,hosts,fuzzIP,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
             print 'Fuzzy monkey need sleep.  Resting for 5 seconds.'
             time.sleep(5)
 
-def saveResults(dbConn,coll,target,port,size,startTime,endTime):
+def saveResults(dbConn,coll,target,port,size,startTime,endTime,monkeyId):
     action = dbConn.action
-    action.insert({'action':'fuzz','ip':target,'port':port,'bytes':size,'start':startTime,'end':endTime})
+    action.insert({'action':'fuzz','ip':target,'port':port,'bytes':size,'start':startTime,'end':endTime,'id':monkeyId})
     
     
 
