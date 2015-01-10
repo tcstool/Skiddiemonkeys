@@ -302,9 +302,9 @@ def startMonkeys():
     global options
     conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
-    options['runTime'] = raw_input('How long should the monkeys be loose? ')
-    print 'Fly my pretties, fly!'
+    options['runTime'] = raw_input('How many minutes should the monkeys be loose? ')
     startMonkeysParam(options, db)
+    raw_input('Fly my pretties, fly! Press enter to return to the main menu.')
 
 
 def startMonkeysParam(options, db):
@@ -317,7 +317,7 @@ def startMonkeysParam(options, db):
                 s.connect(monkey['ip'], 7433)
                 work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
                     'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['min']) + ',' + str(
-                    monkey['max']) + str(monkey['id'])
+                    monkey['max']) +',' + str(monkey['id'])
                 s.send(work)
                 s.close()
 
@@ -331,7 +331,8 @@ def startMonkeysParam(options, db):
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((monkey['ip'], 7433))
                 work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
-                    'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + str(monkey['id'])
+                    'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['id'])
+                print work
                 s.send(work)
                 s.close()
 
@@ -361,19 +362,17 @@ def monkeyReport():
     else:
         savePath = raw_input('Enter file name to save: ')
 
-        try:
-            fo = open(savePath, 'wb')
 
-            if outType == 1:  #Write CSV header row
-                fo.write('action,attacker,target,starttime,endtime\n')
+        fo = open(savePath, 'wb')
 
-            for event in db.action.find(): # loop through events
-                if outType == 1:
-                    fo.write(event['action']+','+str(db.monkeys.find_one({'id':str(event['id'])})['id'])+','+event['target']+','+event['start']+','+event['end']+'\n')
+        if outType == 1:  #Write CSV header row
+            fo.write('action,attacker,target,starttime,endtime\n')
 
-        except Exception,e:  #debug
-            print e #debug
-            raw_input('Something went wrong writing the output.  Press enter to return')
+        for event in db.actions.find(): # loop through events
+            if outType == 1:
+                fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+'\n')
+
+        raw_input('All done!')
 
 
 if __name__ == '__main__':
