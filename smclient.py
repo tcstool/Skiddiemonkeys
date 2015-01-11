@@ -302,6 +302,13 @@ def startMonkeys():
     global options
     conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
+
+    if 'actions' in db.collection_names() or 'hosts' in db.collection_names():
+        if raw_input('Previous monkey attacks found.  Erase? ').lower() == 'y':
+            db['actions'].drop()
+            db['hosts'].drop()
+
+
     options['runTime'] = raw_input('How many minutes should the monkeys be loose? ')
     startMonkeysParam(options, db)
     raw_input('Fly my pretties, fly! Press enter to return to the main menu.')
@@ -373,6 +380,7 @@ def monkeyReport():
                 fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+'\n')
 
         raw_input('All done!')
+        return
 
 
 if __name__ == '__main__':
