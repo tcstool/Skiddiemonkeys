@@ -37,9 +37,6 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
         conn = MongoClient(dbIp,27017)
         db = conn[dbName]
         hosts = db.hosts
-
-        
-        start = time.ctime()
         
         if hosts.find({'location':monkeyLoc}).count() == 0:
             print 'Fuzzy monkey is waiting for work.  Eating bananas.  Will check again in 10 seconds.'

@@ -40,7 +40,7 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         start = time.ctime()
         index = randint(0,len(hostList)-1)
         nm = nmap.PortScanner()
-
+        print 'monkey iq: ' + monkeyIq #debug
         if monkeyIq == 0: #Almost as smart as Gregory Evans
             nm.scan(hostList[index])
 
@@ -62,13 +62,14 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                     openPorts.append(port)
              
             if len(openPorts) != 0:        
-                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,conn,monkeyId)
+                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,conn,monkeyId,monkeyLoc)
 
+    print 'Monkey shift is over.'
     return
     
-def saveResults(target,openPorts,dbName,startTime,endTime,conn,monkeyId):
+def saveResults(target,openPorts,dbName,startTime,endTime,conn,monkeyId,location):
     db = conn[dbName]
-    data = {'ip':target,'ports':openPorts}
+    data = {'ip':target,'ports':openPorts, 'location':location}
     hosts = db.hosts
     action = db.actions
     

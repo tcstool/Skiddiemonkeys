@@ -19,6 +19,7 @@ from pymongo import MongoClient
 import psycopg2
 import re
 import socket
+import time
 from random import randint
 
 
@@ -311,8 +312,14 @@ def startMonkeys():
 
     options['runTime'] = raw_input('How many minutes should the monkeys be loose? ')
     startMonkeysParam(options, db)
-    raw_input('Fly my pretties, fly! Press enter to return to the main menu.')
 
+    print 'Fly my pretties, fly!'
+    timeout = time.time() + 60 * int(options['runTime'])
+
+    while True:
+        if time.time() > timeout:
+            raw_input('End of the day! Punching out. Check servers to make sure all work is done.\nPress enter to return to the main menu.')
+            break
 
 def startMonkeysParam(options, db):
     for monkey in db.monkeys.find():
@@ -321,7 +328,7 @@ def startMonkeysParam(options, db):
         if monkey['type'] == 3:  #Fuzzy monkeys require extra instructions
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(monkey['ip'], 7433)
+                s.connect((monkey['ip'], 7433))
                 work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
                     'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['min']) + ',' + str(
                     monkey['max']) +',' + str(monkey['id'])
@@ -339,7 +346,6 @@ def startMonkeysParam(options, db):
                 s.connect((monkey['ip'], 7433))
                 work = str(monkey['type']) + ',' + str(monkey['iq']) + ',' + monkey['location'] + ',' + options[
                     'runTime'] + ',' + options['dbname'] + ',' + options['dbip'] + ',' + str(monkey['id'])
-                print work
                 s.send(work)
                 s.close()
 
@@ -373,11 +379,15 @@ def monkeyReport():
         fo = open(savePath, 'wb')
 
         if outType == 1:  #Write CSV header row
-            fo.write('action,attacker,target,starttime,endtime\n')
+            fo.write('action,attacker,target,starttime,endtime,fuzzport,fuzzbytes,\n')
 
         for event in db.actions.find(): # loop through events
             if outType == 1:
-                fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+'\n')
+                if event['action'] == 'fuzz':
+                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+ ',' + event['fuzzport'] + ',' + event['fuzzbytes'] +'\n')
+
+                else:
+                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+',NA,NA\n')
 
         raw_input('All done!')
         return
