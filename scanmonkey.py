@@ -41,16 +41,17 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         index = randint(0,len(hostList)-1)
         nm = nmap.PortScanner()
         print 'monkey iq: ' + monkeyIq #debug
-        if monkeyIq == 0: #Almost as smart as Gregory Evans
+
+        if int(monkeyIq) == 0: #Almost as smart as Gregory Evans
             nm.scan(hostList[index])
 
-        elif monkeyIq == 1: #Level 1 monkeys aren't foiled by ICMP being blocked to the host
+        elif int(monkeyIq) == 1: #Level 1 monkeys aren't foiled by ICMP being blocked to the host
             nm.scan(hostList[index],arguments='-P0 -A')
 
-        elif monkeyIq == 2: #Level 2 monkeys run full connect scans to be a bit more stealthy
+        elif int(monkeyIq) == 2: #Level 2 monkeys run full connect scans to be a bit more stealthy
             nm.scan(hostList[index],arguments='-P0 -sT -A')
 
-        elif monkeyIq == 3: #Level 3 monkeys include decoy IPs in their scans
+        elif int(monkeyIq) == 3: #Level 3 monkeys include decoy IPs in their scans
             nm.scan(hostList[index],arguments='-P0,-sT,-A,-D4.2.2.2,8.8.8.8,172.1.2.4,3.4.2.1')
 
         end = time.ctime()

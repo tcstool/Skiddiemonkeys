@@ -56,7 +56,13 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
             s = socket(AF_INET, SOCK_STREAM)
             s.connect((fuzzIP, int(fuzzTCP)))
             s.send(fuzzData)
-            result = s.recv(100) #don't care what we get back.  Just want to not look suspect by not receiving the data before killing the socket.
+
+            try:
+                result = s.recv(100) #Don't care what we get back.
+
+            except:  #Handle TCP resets and other aggressive network traffic semi gracefully
+                pass
+
             s.close()
             end = time.ctime()
             saveResults(db,hosts,fuzzIP,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
@@ -64,7 +70,7 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
             time.sleep(5)
 
 def saveResults(dbConn,coll,target,port,size,startTime,endTime,monkeyId):
-    action = dbConn.action
+    action = dbConn.actions
     action.insert({'action':'fuzz','ip':target,'port':port,'bytes':size,'start':startTime,'end':endTime,'id':monkeyId})
     
     
