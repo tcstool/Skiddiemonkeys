@@ -27,7 +27,6 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
 
     while True:
         targets = [] #reinit each time through
-
         time.sleep(1)
 
         
