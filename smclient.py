@@ -210,7 +210,7 @@ def makeMonkeys():
 
     numMonkeys = int(raw_input('Enter total number of monkeys to create: '))
     validIQs = [0, 1, 2, 3]
-    validTypes = [1, 2, 3, 4]
+    validTypes = [1, 2, 3, 4, 5]
     validLocs = ['i', 'e']
 
     monkeyIQ = {}
@@ -384,12 +384,12 @@ def monkeyReport():
         for event in db.actions.find(): # loop through events
             if outType == 1:
                 if event['action'] == 'fuzz':
-                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+ ',' + event['fuzzport'] + ',' + event['fuzzbytes'] +'\n')
+                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+ ',' + event['port'] + ',' + event['bytes'] +'\n')
 
                 else:
                     fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+',NA,NA\n')
 
-        raw_input('All done!')
+        raw_input('\nAll done! Press enter to return to the main menu.')
         return
 
 

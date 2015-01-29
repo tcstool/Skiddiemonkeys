@@ -40,7 +40,6 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         start = time.ctime()
         index = randint(0,len(hostList)-1)
         nm = nmap.PortScanner()
-        print 'monkey iq: ' + monkeyIq #debug
 
         if int(monkeyIq) == 0: #Almost as smart as Gregory Evans
             nm.scan(hostList[index])

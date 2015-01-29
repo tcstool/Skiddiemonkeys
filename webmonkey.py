@@ -58,6 +58,7 @@ def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             time.sleep(10)
 
         else:
+            print 'Web monkey got work! Starting directory brute forcing!'
             webBrute (targets,ports,db,hosts,monkeyId)
 
 def webBrute(targets,ports,db,coll,monkeyId):
@@ -70,12 +71,21 @@ def webBrute(targets,ports,db,coll,monkeyId):
     with open('./lists/weblist.txt') as f:
         for directory in f:
             if webPort == 80:
-                urllib2.urlopen('http://' + webIP + '/' + directory + '/' )
+                try:
+                    urllib2.urlopen('http://' + webIP + '/' + directory + '/', timeout=3 )
+
+                except urllib2.URLError:
+                    pass
 
             elif webPort == 443:
-                urllib2.urlopen('https://' + webIP + '/' + directory + '/')
+                try:
+                    urllib2.urlopen('https://' + webIP + '/' + directory + '/',timeout=3 )
+
+                except urllib2.URLError:
+                    pass
 
     endTime = time.ctime()
+    print 'finished directory brute forcing of ' + webIP + 'at ' + endTime
     saveResults(db,coll,webIP,webPort,startTime,endTime,monkeyId)
 
     return
