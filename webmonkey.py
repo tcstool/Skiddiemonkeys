@@ -17,7 +17,7 @@ from pymongo import MongoClient
 from random import randint
 import time
 import urllib2
-
+import ssl
 
 def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
