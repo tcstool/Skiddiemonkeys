@@ -68,24 +68,38 @@ def webBrute(targets,ports,db,coll,monkeyId):
 
     startTime = time.ctime()
 
-    with open('./lists/weblist.txt') as f:
-        for directory in f:
-            if webPort == 80:
-                try:
-                    urllib2.urlopen('http://' + webIP + '/' + directory + '/', timeout=3 )
+    try:
+        with open('./lists/weblist.txt') as f:
+            dirList = f.readlines()
 
-                except urllib2.URLError:
-                    pass
+    except:
+        print 'Error:  Couldn\'t open directory brute forcing file.'
+        return
 
-            elif webPort == 443:
-                try:
-                    urllib2.urlopen('https://' + webIP + '/' + directory + '/',timeout=3 )
 
-                except urllib2.URLError:
-                    pass
+    for directory in dirList:
+        if webPort == 80:
+            try:
+                urllib2.urlopen('http://' + webIP + '/' + directory.rstrip() + '/', timeout=3 )
+
+            except urllib2.URLError:
+                pass
+
+            except ssl.SSLError:
+                pass
+
+        elif webPort == 443:
+            try:
+                urllib2.urlopen('https://' + webIP + '/' + directory.rstrip() + '/',timeout=3 )
+
+            except urllib2.URLError:
+                pass
+
+            except ssl.SSLError:
+                pass
 
     endTime = time.ctime()
-    print 'finished directory brute forcing of ' + webIP + 'at ' + endTime
+    print 'finished directory brute forcing of ' + webIP + ' at ' + endTime
     saveResults(db,coll,webIP,webPort,startTime,endTime,monkeyId)
 
     return
