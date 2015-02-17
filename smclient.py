@@ -190,15 +190,37 @@ def loadTargetsParam(options, fileName, db):
 def makeMonkeys():
     global options
     global monkeyIds
+    monkeyTypes = [None,'Scan Monkey',None,'Fuzzy Monkey',None,'Web Monkey']
+    dropSel = True
+    existing = []
     print 'Monkey setup'
     print '------------'
     conn = MongoClient(options['dbip'], 27017)
     db = conn[options['dbname']]
 
     if 'monkeys' in db.collection_names():
+        if raw_input('Existing monkeys found.  Remove? ').lower() == 'y':
+            count = 1
 
-        if raw_input('Existing monkeys found.  Remove?').lower() == 'y':
-            db['monkeys'].drop()
+            for monkey in db.monkeys.find():
+                print str(count) + '-' + str(monkey['ip']) + '-' + monkeyTypes[ int(monkey['type']) ]
+                existing.append(monkey['id'])
+                count += 1
+
+            while dropSel == True:
+                dropSel = raw_input('Enter monkey to remove,e to remove all monkeys, or q to make monkeys: ')
+
+                if  dropSel.lower() == 'e':
+                    db['monkeys'].drop()
+                    print 'Monkeys removed!'
+
+                elif dropSel.lower() == 'q':
+                    dropSel = False
+
+                else:
+                    db.monkeys.remove({'id' : existing[int(dropSel)-1]})
+                    dropSel = True
+
 
         else:
             #Get the IDs of the existing monkeys to avoid dupes
