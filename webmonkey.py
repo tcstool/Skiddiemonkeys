@@ -108,3 +108,4 @@ def webBrute(targets,ports,db,coll,monkeyId):
 def saveResults(dbConn,coll,target,port,startTime,endTime,monkeyId):
     action = dbConn.actions
     action.insert({'action':'webdirscan','ip':target,'port':port,'start':startTime,'end':endTime,'id':monkeyId})
+    return
