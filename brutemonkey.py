@@ -44,22 +44,22 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                     ports.append(23)
 
 
-            if len(targets) == 0:
-                print 'Brute monkey is waiting for something to brute force.  Eating bananas.  Will check again in 10 seconds.'
-                time.sleep(10)
+        if len(targets) == 0:
+            print 'Brute monkey is waiting for something to brute force.  Eating bananas.  Will check again in 10 seconds.'
+            time.sleep(10)
 
-            else:
-                print 'Brute monkey got work! Starting credential brute forcing!'
-                index = randint(0,len(targets)-1)
+        else:
+            print 'Brute monkey got work! Starting credential brute forcing!'
+            index = randint(0,len(targets)-1)
 
-                if ports[index] == 21:
-                    ftpBrute(targets[index],db,hosts,monkeyId)
+            if ports[index] == 21:
+                ftpBrute(targets[index],db,hosts,monkeyId)
 
-                elif ports[index] == 22:
-                    sshBrute(targets[index],db,hosts,monkeyId)
+            elif ports[index] == 22:
+                sshBrute(targets[index],db,hosts,monkeyId)
 
-                elif ports[index] == 23:
-                    telBrute(targets[index],db,hosts,monkeyId)
+            elif ports[index] == 23:
+                 telBrute(targets[index],db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -80,10 +80,14 @@ def sshBrute(victim,db,coll,monkeyId):
         try:
             ssh.connect(victim, 22, user, pwd)
 
-        except paramiko.AuthenticationException:
+        except paramiko.AuthenticationException, e:
+            print 'There was an SSH authentication exception'
+            print e
             pass
 
-        except socket.error:
+        except socket.error, e:
+            print 'There was an issue opening the socket'
+            print e
             pass
 
     endTime = time.ctime()
@@ -148,4 +152,3 @@ def telBrute (victim,db,coll,monkeyId):
 def saveResults(whichBrute,dbConn,coll,target,port,startTime,endTime,monkeyId):
     action = dbConn.actions
     action.insert({'action': whichBrute,'ip':target,'port':port,'start':startTime,'end':endTime,'id':monkeyId})
-    return

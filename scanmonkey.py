@@ -78,5 +78,4 @@ def saveResults(target,openPorts,dbName,startTime,endTime,conn,monkeyId,location
         hosts.insert(data)
     
     action.insert({'action':'synscan','ip':target,'start':startTime,'end':endTime,'id':monkeyId}) #Record all monkey activity, even if it's already occurred (i.e.Same target gets hit more than once)
-    return
     
