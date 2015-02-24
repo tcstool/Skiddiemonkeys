@@ -19,6 +19,7 @@ from thread import *
 import scanmonkey
 import fuzzymonkey
 import webmonkey
+import brutemonkey
 
 
 def main():
@@ -60,6 +61,9 @@ def acceptWork(conn):
 
         elif jobDetails[0] == '3':
             fuzzymonkey.fuzzPorts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],jobDetails[6],jobDetails[7],int(jobDetails[8]))
+
+        elif jobDetails[0] == '4':
+            brutemonkey.findLoginBoxes(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],int(jobDetails[6]))
 
         elif jobDetails[0] == '5':
             webmonkey.findWebBoxes(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],int(jobDetails[6]))

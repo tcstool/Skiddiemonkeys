@@ -263,7 +263,7 @@ def makeMonkeys():
             print '1-Scanner Monkey'
             print '2-Exploit Monkey'
             print '3-Fuzzy Monkey'
-            print '4-Login Monkey'
+            print '4-Brute Monkey'
             print '5-Web Monkey'
             monkeyType[i] = int(raw_input('Input: '))
 
