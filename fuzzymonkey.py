@@ -26,7 +26,7 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
     timeout = time.time() + 60 * runTime
 
     while True:
-        targets = [] #reinit each time through
+        hostList = {} #reinit each time through
         time.sleep(1)
 
         
@@ -43,17 +43,19 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
         
         else:
             for work in hosts.find({'location':monkeyLoc}):
-                targets.append(work)
+                #Start priority calculation
+                decisionCalc = ( int(monkeyIq) * int(db.targets.find({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
+                hostList.update( {work['ip'] : decisionCalc } )
 
-            index = randint(0,len(targets)-1)
-            fuzzIP = str(targets[index]['ip'])
+            target = max(hostList,key=hostList.get)
+
             fuzzTCP = str(targets[index]['ports'][randint(0,len(targets[index]['ports'])-1)])
             fuzzData = genFuzzData(randint(int(minData),int(maxData)))
-            print 'Fuzzy monkey got work! Fuzzing ' + fuzzIP + ' on port ' + fuzzTCP + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
+            print 'Fuzzy monkey got work! Fuzzing ' + target + ' on port ' + fuzzTCP + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
             
             start = time.ctime()
             s = socket(AF_INET, SOCK_STREAM)
-            s.connect((fuzzIP, int(fuzzTCP)))
+            s.connect((target, int(fuzzTCP)))
             s.send(fuzzData)
 
             try:
@@ -64,7 +66,7 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
 
             s.close()
             end = time.ctime()
-            saveResults(db,hosts,fuzzIP,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
+            saveResults(db,hosts,target,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
             print 'Fuzzy monkey need sleep.  Resting for 5 seconds.'
             time.sleep(5)
 

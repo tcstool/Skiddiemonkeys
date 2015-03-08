@@ -35,7 +35,8 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
         for host in db.targets.find({'location':monkeyLoc}):
             #Start priority calculation
-            decisionCalc = ( int(monkeyIq) * int(host['value']) )/(db.actions.find({'ip' : host }).count() + 1 ) + randint(1,10)
+            print 'Action count for ' + str(host['ip']) + ':' +  str(db.actions.find({'ip' : host['ip'] }).count()) #debug
+            decisionCalc = ( int(monkeyIq) * int(host['value']) )/(db.actions.find({'ip' : host['ip'] }).count() + 1 ) + randint(1,10)
             hostList.update( {host['ip'] : decisionCalc } )
 
         print str(hostList) #debug
@@ -43,7 +44,6 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         target = max(hostList,key=hostList.get)
 
         start = time.ctime()
-        #index = randint(0,len(hostList)-1)
         print 'Starting port scan of ' + target
         nm = nmap.PortScanner()
 
