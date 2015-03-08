@@ -24,7 +24,7 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     while True:
         time.sleep(1)
 
-        hostList = [] #reinit each time through loop to get new hosts from other clients possibly.
+        hostList = {} #reinit each time through loop to get new hosts from other clients possibly.
         openPorts = [] #reinit each time through loop
 
         if time.time() > timeout:
@@ -34,28 +34,33 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         db = conn[dbName]
 
         for host in db.targets.find({'location':monkeyLoc}):
-            hostList.append(host['ip'])
+            #Start priority calculation
+            decisionCalc = ( int(monkeyIq) * int(host['value']) )/(db.actions.find({'ip' : host }).count() + 1 ) + randint(1,10)
+            hostList.update( {host['ip'] : decisionCalc } )
 
-        
+        print str(hostList) #debug
+        #Find highest decision calculation
+        target = max(hostList,key=hostList.get)
+
         start = time.ctime()
-        index = randint(0,len(hostList)-1)
-        print 'Starting port scan of ' + hostList[index]
+        #index = randint(0,len(hostList)-1)
+        print 'Starting port scan of ' + target
         nm = nmap.PortScanner()
 
         if int(monkeyIq) == 0: #Almost as smart as Gregory Evans
-            nm.scan(hostList[index])
+            nm.scan(target)
 
         elif int(monkeyIq) == 1: #Level 1 monkeys aren't foiled by ICMP being blocked to the host
-            nm.scan(hostList[index],arguments='-P0 -A')
+            nm.scan(target,arguments='-P0 -A')
 
         elif int(monkeyIq) == 2: #Level 2 monkeys run full connect scans to be a bit more stealthy
-            nm.scan(hostList[index],arguments='-P0 -sT -A')
+            nm.scan(target,arguments='-P0 -sT -A')
 
         elif int(monkeyIq) == 3: #Level 3 monkeys include decoy IPs in their scans
-            nm.scan(hostList[index],arguments='-P0,-sT,-A,-D4.2.2.2,8.8.8.8,172.1.2.4,3.4.2.1')
+            nm.scan(target,arguments='-P0,-sT,-A,-D4.2.2.2,8.8.8.8,172.1.2.4,3.4.2.1')
 
         end = time.ctime()
-        print "Scan monkey finished scan of " + hostList[index] + " at " + end
+        print "Scan monkey finished scan of " + target + " at " + end
         
         if len( nm.all_hosts() ) != 0:
             for port in nm[nm.all_hosts()[0]]['tcp'].keys():

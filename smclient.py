@@ -241,6 +241,7 @@ def makeMonkeys():
     monkeyIp = {}
     minFuzzSize = {}
     maxFuzzSize = {}
+
     for i in range(1, numMonkeys + 1):
         monkeyIQ[i] = None
         monkeyType[i] = None
