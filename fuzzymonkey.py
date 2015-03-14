@@ -44,27 +44,32 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
         else:
             for work in hosts.find({'location':monkeyLoc}):
                 #Start priority calculation
-                decisionCalc = ( int(monkeyIq) * int(db.targets.find({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
+                decisionCalc = ( int(monkeyIq) * int(db.targets.find_one({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
                 hostList.update( {work['ip'] : decisionCalc } )
 
+            print str(hostList) #debug
             target = max(hostList,key=hostList.get)
-
-            fuzzTCP = str(targets[index]['ports'][randint(0,len(targets[index]['ports'])-1)])
+            print str(target) #debug
+            openPorts = db.hosts.find_one({'ip' : target})['ports']
+            fuzzTCP = openPorts[randint(0,len(openPorts)-1)]
             fuzzData = genFuzzData(randint(int(minData),int(maxData)))
-            print 'Fuzzy monkey got work! Fuzzing ' + target + ' on port ' + fuzzTCP + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
+            print 'Fuzzy monkey got work! Fuzzing ' + target + ' on port ' + str(fuzzTCP) + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
             
             start = time.ctime()
-            s = socket(AF_INET, SOCK_STREAM)
-            s.connect((target, int(fuzzTCP)))
-            s.send(fuzzData)
+
 
             try:
+                s = socket(AF_INET, SOCK_STREAM)
+                s.settimeout(10)
+                s.connect((target, fuzzTCP))
+                s.send(fuzzData)
                 result = s.recv(100) #Don't care what we get back.
+                s.close()
 
-            except:  #Handle TCP resets and other aggressive network traffic semi gracefully
+            except:
+                #Handle TCP resets and other aggressive network traffic semi gracefully
                 pass
 
-            s.close()
             end = time.ctime()
             saveResults(db,hosts,target,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
             print 'Fuzzy monkey need sleep.  Resting for 5 seconds.'
