@@ -47,9 +47,7 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
                 decisionCalc = ( int(monkeyIq) * int(db.targets.find_one({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
                 hostList.update( {work['ip'] : decisionCalc } )
 
-            print str(hostList) #debug
             target = max(hostList,key=hostList.get)
-            print str(target) #debug
             openPorts = db.hosts.find_one({'ip' : target})['ports']
             fuzzTCP = openPorts[randint(0,len(openPorts)-1)]
             fuzzData = genFuzzData(randint(int(minData),int(maxData)))

@@ -12,9 +12,8 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
 
     while True:
-        targets = []
+        hostList = {}
         ports = []
-        targetTried = False
         time.sleep(1)
 
         if time.time() > timeout:
@@ -31,35 +30,41 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
         else:
             for work in hosts.find({'location':monkeyLoc}):
-                if 21 in work['ports']:
-                    targets.append(work['ip'])
-                    ports.append(21)
 
-                if 22 in work['ports']:
-                    targets.append(work['ip'])
-                    ports.append(22)
+                if 21 in work['ports'] or 22 in work['ports'] or 23 in work['ports']:
+                    decisionCalc = ( int(monkeyIq) * int(db.targets.find_one({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
+                    hostList.update( {work['ip'] : decisionCalc } )
 
-                if 23 in work['ports']:
-                    targets.append(work['ip'])
-                    ports.append(23)
+            if len(hostList) > 0:
+                    target = max(hostList,key=hostList.get)
+                    openPorts = db.hosts.find_one({'ip' : target}['ports'])
+
+                    if 21 in openPorts:
+                        ports.append(21)
+
+                    if 22 in openPorts:
+                        ports.append(22)
+
+                    if 23 in openPorts:
+                        ports.append(23)
 
 
-        if len(targets) == 0:
+        if len(ports) == 0:
             print 'Brute monkey is waiting for something to brute force.  Eating bananas.  Will check again in 10 seconds.'
             time.sleep(10)
 
         else:
             print 'Brute monkey got work! Starting credential brute forcing!'
-            index = randint(0,len(targets)-1)
+            index = randint(0,len(ports)-1)
 
             if ports[index] == 21:
-                ftpBrute(targets[index],db,hosts,monkeyId)
+                ftpBrute(target,db,hosts,monkeyId)
 
             elif ports[index] == 22:
-                sshBrute(targets[index],db,hosts,monkeyId)
+                sshBrute(target,db,hosts,monkeyId)
 
             elif ports[index] == 23:
-                 telBrute(targets[index],db,hosts,monkeyId)
+                 telBrute(target,db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
