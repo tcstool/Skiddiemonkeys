@@ -23,7 +23,7 @@ def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
 
     while True:
-        targets = [] #reinit variables each time through to account for new scanner data
+        hostList = {} #reinit variables each time through to account for new scanner data
         ports = []
         time.sleep(1)
 
@@ -40,31 +40,31 @@ def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
         else:
             for work in hosts.find({'location':monkeyLoc}):
-
                 if 80 in work['ports'] or 443 in work['ports']:
-                    if 80 in work['ports']:
-                        targets.append(work['ip'])
-                        ports.append(80)
+                    decisionCalc = ( int(monkeyIq) * int(db.targets.find_one({'ip' : work['ip']})['value']))/(db.actions.find({'ip' : work['ip'] }).count() + 1 ) + randint(1,10)
+                    hostList.update( {work['ip'] : decisionCalc } )
 
-                    elif 443 in work['ports']:
-                        targets.append(work['ip'])
-                        ports.append(443)
+            if len(hostList) > 0:
+                target = max(hostList,key=hostList.get)
+                openPorts = db.hosts.find_one({'ip' : target})['ports']
 
-                else:
-                    continue
+            if 80 in openPorts:
+                ports.append(80)
 
-        if len(targets) == 0:
+            if 443 in openPorts:
+                ports.append(443)
+
+        if len(ports) == 0:
             print 'Web monkey is waiting for a web server.  Eating bananas.  Will check again in 10 seconds.'
             time.sleep(10)
 
         else:
             print 'Web monkey got work! Starting directory brute forcing!'
-            webBrute (targets,ports,db,hosts,monkeyId)
+            index = randint(0,len(ports)-1)
+            port = ports[index]
+            webBrute (target,port,db,hosts,monkeyId)
 
-def webBrute(targets,ports,db,coll,monkeyId):
-    index = randint(0,len(targets)-1)
-    webIP = targets[index]
-    webPort = ports[index]
+def webBrute(target,port,db,coll,monkeyId):
 
     startTime = time.ctime()
 
@@ -78,9 +78,9 @@ def webBrute(targets,ports,db,coll,monkeyId):
 
 
     for directory in dirList:
-        if webPort == 80:
+        if port == 80:
             try:
-                urllib2.urlopen('http://' + webIP + '/' + directory.rstrip() + '/', timeout=3 )
+                urllib2.urlopen('http://' + target + '/' + directory.rstrip() + '/', timeout=3 )
 
             except urllib2.URLError:
                 pass
@@ -88,9 +88,9 @@ def webBrute(targets,ports,db,coll,monkeyId):
             except ssl.SSLError:
                 pass
 
-        elif webPort == 443:
+        elif port == 443:
             try:
-                urllib2.urlopen('https://' + webIP + '/' + directory.rstrip() + '/',timeout=3 )
+                urllib2.urlopen('https://' + target + '/' + directory.rstrip() + '/',timeout=3 )
 
             except urllib2.URLError:
                 pass
@@ -99,8 +99,8 @@ def webBrute(targets,ports,db,coll,monkeyId):
                 pass
 
     endTime = time.ctime()
-    print 'finished directory brute forcing of ' + webIP + ' at ' + endTime
-    saveResults(db,coll,webIP,webPort,startTime,endTime,monkeyId)
+    print 'finished directory brute forcing of ' + target + ' at ' + endTime
+    saveResults(db,coll,target,port,startTime,endTime,monkeyId)
 
     return
 

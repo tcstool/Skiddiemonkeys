@@ -35,11 +35,9 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
         for host in db.targets.find({'location':monkeyLoc}):
             #Start priority calculation
-            print 'Action count for ' + str(host['ip']) + ':' +  str(db.actions.find({'ip' : host['ip'] }).count()) #debug
             decisionCalc = ( int(monkeyIq) * int(host['value']) )/(db.actions.find({'ip' : host['ip'] }).count() + 1 ) + randint(1,10)
             hostList.update( {host['ip'] : decisionCalc } )
 
-        print str(hostList) #debug
         #Find highest decision calculation
         target = max(hostList,key=hostList.get)
 
