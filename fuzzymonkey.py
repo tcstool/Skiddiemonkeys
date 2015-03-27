@@ -19,7 +19,7 @@ from random import choice
 from sys import getsizeof
 import time
 import string
-
+from helperFunctions import openMDB
 
 
 def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
@@ -33,8 +33,10 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
         if time.time() > timeout:
             break
 
-        conn = MongoClient(dbIp,27017)
-        db = conn[dbName]
+        db = openMDB(dbIp,dbName)
+        if db is None:
+            print 'Could not connect to DB'
+
         hosts = db.hosts
         
         if hosts.find({'location':monkeyLoc}).count() == 0:

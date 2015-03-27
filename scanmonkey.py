@@ -17,6 +17,7 @@ from pymongo import MongoClient
 import nmap
 import time
 from random import randint
+from helperFunctions import openMDB
 
 def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
@@ -30,8 +31,10 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         if time.time() > timeout:
             break
 
-        conn = MongoClient(dbIp,27017)
-        db = conn[dbName]
+        db = openMDB(dbIp,dbName)
+        if db is None:
+            print 'could not connect to db'
+
 
         for host in db.targets.find({'location':monkeyLoc}):
             #Start priority calculation

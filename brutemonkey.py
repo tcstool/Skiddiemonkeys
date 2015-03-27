@@ -7,6 +7,7 @@ import socket
 import time
 from pymongo import MongoClient
 from random import randint
+from helperFunctions import openMDB
 
 def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
@@ -19,8 +20,9 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         if time.time() > timeout:
             break
 
-        conn = MongoClient(dbIp,27017)
-        db = conn[dbName]
+        db = openMDB(dbIp,dbName)
+        if db is None:
+            print 'Could not connect to db'
         hosts = db.hosts
 
 
