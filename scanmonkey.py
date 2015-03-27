@@ -58,7 +58,7 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             nm.scan(target,arguments='-P0,-sT,-A,-D4.2.2.2,8.8.8.8,172.1.2.4,3.4.2.1')
 
         end = time.ctime()
-        print "Scan monkey finished scan of " + target + " at " + end
+        print 'Scan monkey finished scan of ' + target +  ' at ' + end
         
         if len( nm.all_hosts() ) != 0:
             for port in nm[nm.all_hosts()[0]]['tcp'].keys():
