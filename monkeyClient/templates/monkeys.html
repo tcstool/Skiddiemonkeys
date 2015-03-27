@@ -1,0 +1,40 @@
+<html>
+{% load staticfiles %}
+   <head>
+      <title>Skiddiemonkeys</title>
+      <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/>
+   </head>
+   <body>
+<nav class="navbar navbar-default">
+<div class="container-fluid">
+<div class="navbar-header">
+	<a class="navbar-brand" href="#">Skiddiemonkeys</a>
+</div>
+<div>
+<ul class="nav navbar-nav">
+<li><a href="/client">Client</a></li>
+<li class="active"><a href="/monkeys">Monkeys</a></li>
+<li><a href="/results">Results</a></li>
+</ul>
+</div>
+</div>
+</nav>
+
+
+<h3>Monkey Settings</h3>
+{% if form.errors %}
+	<p style="color: red;">
+		Please correct the error{{ form.errors|pluralize }} below.
+	</p>
+{% endif %}
+<h4>Add a Monkey</h4>
+<form action="" method="post">
+	<table>
+		{{ form.as_table }}
+	</table>
+{% csrf_token %}
+<input type="submit" value="Add">
+</form>
+
+   </body>
+</html>

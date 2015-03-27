@@ -21,7 +21,7 @@ import re
 import socket
 import time
 from random import randint
-
+from helperFunctions import openMDB
 
 def main():
     global options
@@ -110,9 +110,9 @@ def dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName):
         pgConn = psycopg2.connect(database=msfDbName, host=msfDbIp, user=msfDbUser, password=msfDbPass)
         cur = pgConn.cursor()
         cur.execute('SELECT file,fullname FROM module_details;')
-        mongoConn = MongoClient(options['dbip'], 27017)
-        mongoDb = mongoConn[options['dbname']]
-
+        mongoDb = openMDB(options['dbip'],options['dbname'])
+        if mongoDb is None:
+            print 'I am error'
         if 'logins' in mongoDb.collection_names() or 'sploits' in mongoDb.collection_names():
             if (options['CLI'] == 'true' and raw_input('Previous exploit data found.  Erase? ').lower() == 'y') or (
                             options['CLI'] == 'false' and options['eraseSploitData'] == 'true'):
@@ -158,9 +158,9 @@ def dbLoadModules(options, msfDbIp, msfDbUser, msfDbPass, msfDbName):
 
 def loadTargets():
     global options
-    conn = MongoClient(options['dbip'], 27017)
-    db = conn[options['dbname']]
-
+    db = openMDB(options['dbip'],options['dbname'])
+    if db is None:
+        print 'Could not connect to DB'
     if 'targets' in db.collection_names():
         if raw_input('Remove current list of targets? ').lower() == 'y':
             db['targets'].drop()
@@ -179,8 +179,12 @@ def loadTargetsParam(options, fileName, db):
     if options['CLI'] == 'false' and options['eraseTargetsData'] == 'true':
         db['targets'].drop()
 
-    with open(fileName) as f:
-        ipList = f.readlines()
+    ipList=''
+    if options['CLI'] == 'false':
+        ipList=fileName.readlines()
+    else: 
+        with open(fileName) as f:
+            ipList = f.readlines()
 
     for target in ipList:
         db.targets.insert({'ip': target.split(',')[0], 'value': target.split(',')[1],
@@ -195,9 +199,9 @@ def makeMonkeys():
     existing = []
     print 'Monkey setup'
     print '------------'
-    conn = MongoClient(options['dbip'], 27017)
-    db = conn[options['dbname']]
-
+    db = openMDB(options['dbip'],options['dbname'])
+    if db is None:
+        print 'Could not connect to database'
     if 'monkeys' in db.collection_names():
         if raw_input('Existing monkeys found.  Remove? ').lower() == 'y':
             count = 1
@@ -324,9 +328,9 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
 
 def startMonkeys():
     global options
-    conn = MongoClient(options['dbip'], 27017)
-    db = conn[options['dbname']]
-
+    db = openMDB(options['dbip'], options['dbname'])
+    if db is None:
+        print 'Could not connect to db'
     if 'actions' in db.collection_names() or 'hosts' in db.collection_names():
         if raw_input('Previous monkey attacks found.  Erase? ').lower() == 'y':
             db['actions'].drop()
@@ -380,9 +384,9 @@ def startMonkeysParam(options, db):
 
 def monkeyReport():
     global options
-    conn = MongoClient(options['dbip'],27017)
-    db = conn[options['dbname']]
-
+    db = openMDB(options['dbip'], options['dbname'])
+    if db is None:
+        print 'Could not connect to db'
     print 'Monkeys clocking out'
     print '===================='
 

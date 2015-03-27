@@ -1,0 +1,39 @@
+<html>
+{% load staticfiles %}
+{% load solo_tags %}
+{% load tags  %}
+   <head>
+      <title>Skiddiemonkeys</title>
+      <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/>
+   </head>
+   <body>
+<nav class="navbar navbar-default">
+<div class="container-fluid">
+<div class="navbar-header">
+	<a class="navbar-brand" href="#">Skiddiemonkeys</a>
+</div>
+<div>
+<ul class="nav navbar-nav">
+<li><a href="/client">Client</a></li>
+<li><a href="/monkeys">Monkeys</a></li>
+<li class="active"><a href="/results">Results</a></li>
+</ul>
+</div>
+</div>
+</nav>
+
+
+<h3>Monkey Business</h3>
+{% if actions  %}
+<table class="table table-striped table-bordered">
+   <tr>
+   {{ columns|get_key:order|safe  }}
+   </tr>
+
+   {{ actions|get_actions:order|safe }}
+</table>
+{% else  %}
+   <p>Sorry, no results were found</p>
+{% endif  %}   
+   </body>
+</html>

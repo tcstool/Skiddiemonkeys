@@ -18,6 +18,7 @@ from random import randint
 import time
 import urllib2
 import ssl
+from helperFunctions import openMDB
 
 def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
     timeout = time.time() + 60 * runTime
@@ -30,8 +31,12 @@ def findWebBoxes (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         if time.time() > timeout:
             break
 
-        conn = MongoClient(dbIp,27017)
-        db = conn[dbName]
+        db = openMDB(dbIp, dbName)
+        if db is None:
+            print 'could not connect to db'
+
+
+
         hosts = db.hosts
 
         if hosts.find({'location':monkeyLoc}).count() == 0:
