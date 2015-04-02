@@ -295,6 +295,8 @@ def makeMonkeys():
 def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize):
     randId = None
     global monkeyIds
+    if options['CLI'] == 'false':
+        monkeyIds=[]
     #Get in that barrel!
     if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
@@ -411,10 +413,10 @@ def monkeyReport():
         for event in db.actions.find(): # loop through events
             if outType == 1:
                 if event['action'] == 'fuzz':
-                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+ ',' + event['port'] + ',' + event['bytes'] +'\n')
+                    fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + str(event['port']) + ',' + str(event['bytes']) +'\n')
 
                 else:
-                    fo.write(event['action']+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+event['ip']+','+event['start']+','+event['end']+',NA,NA\n')
+                    fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+',NA,NA\n')
 
         raw_input('\nAll done! Press enter to return to the main menu.')
         return

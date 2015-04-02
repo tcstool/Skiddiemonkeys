@@ -20,6 +20,7 @@ import scanmonkey
 import fuzzymonkey
 import webmonkey
 import brutemonkey
+import sploitmonkey
 
 
 def main():
@@ -58,6 +59,9 @@ def acceptWork(conn):
 
         if jobDetails[0] == '1':
             scanmonkey.scanHosts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],int(jobDetails[6]))
+
+        if jobDetails[0] == '2':
+            sploitmonkey.findTargets(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],int(jobDetails[6]))
 
         elif jobDetails[0] == '3':
             fuzzymonkey.fuzzPorts(int(jobDetails[3]),jobDetails[5],jobDetails[4],jobDetails[1],jobDetails[2],jobDetails[6],jobDetails[7],int(jobDetails[8]))

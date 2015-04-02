@@ -61,7 +61,7 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             nm.scan(target,arguments='-P0,-sT,-A,-D4.2.2.2,8.8.8.8,172.1.2.4,3.4.2.1')
 
         end = time.ctime()
-        print "Scan monkey finished scan of " + target + " at " + end
+        print 'Scan monkey finished scan of ' + target +  ' at ' + end
         
         if len( nm.all_hosts() ) != 0:
             for port in nm[nm.all_hosts()[0]]['tcp'].keys():
@@ -69,13 +69,12 @@ def scanHosts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                     openPorts.append(port)
              
             if len(openPorts) != 0:        
-                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,conn,monkeyId,monkeyLoc)
+                saveResults(nm.all_hosts()[0],openPorts,dbName,start,end,db,monkeyId,monkeyLoc)
 
     print 'Monkey shift is over.'
     return
     
-def saveResults(target,openPorts,dbName,startTime,endTime,conn,monkeyId,location):
-    db = conn[dbName]
+def saveResults(target,openPorts,dbName,startTime,endTime,db,monkeyId,location):
     data = {'ip':target,'ports':openPorts, 'location':location}
     hosts = db.hosts
     action = db.actions

