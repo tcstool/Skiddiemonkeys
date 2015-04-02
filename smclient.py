@@ -293,10 +293,8 @@ def makeMonkeys():
 
 
 def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize):
-    randId = None
-    global monkeyIds
-    if options['CLI'] == 'false':
-        monkeyIds=[]
+    randId = 1
+    monkeyIds=list(db.monkeys.distinct("id"))
     #Get in that barrel!
     if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
@@ -305,21 +303,21 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
     for i in monkeyIQ:
         try:
             #generate random monkey identifier
-            while randId not in monkeyIds:
+            while randId in monkeyIds:
                 randId = randint(1,1000000)
-                monkeyIds.append(randId)
+            monkeyIds.append(randId)
 
 
             if monkeyType[i] == 3:
                 db.monkeys.insert(
                     {'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i], 'ip': monkeyIp[i],
                      'min': minFuzzSize[i], 'max': maxFuzzSize[i]})
-                randId = None
+                randId = 1
 
             else:
                 db.monkeys.insert({'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i],
                                    'ip': monkeyIp[i]})
-                randId = None
+                randId = 1
 
             print 'Monkey', count, 'Created!'
             count += 1
