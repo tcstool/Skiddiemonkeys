@@ -33,12 +33,6 @@ def basicInfoForm(request):
 #insert redirect
 		#return HttpResponseRedirect('/client')
 	else:
-		if(request.GET.get('btnStart')):
-			options=getDBOptions()
-			db=openMDB(options['dbip'],options['dbname'])
-			options['runTime']=request.GET.get('duration')
-			if db is not None:
-				smclient.startMonkeysParam(options,db)
 			
 		try:
 			form=basicInfo(instance=monkeyDBInfo.objects.get())
@@ -71,6 +65,12 @@ def monkeyForm(request):
 				print 'monkey db info does not exist'
 		return HttpResponseRedirect('/monkeys')
 	else:
+		if(request.GET.get('btnStart')):
+			options=getDBOptions()
+			db=openMDB(options['dbip'],options['dbname'])
+			options['runTime']=request.GET.get('duration')
+			if db is not None:
+				smclient.startMonkeysParam(options,db)
 		form=addMonkey()
 	return render(request,'monkeys.html',{'form':form})
 

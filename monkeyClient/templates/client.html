@@ -5,16 +5,17 @@
    <head>
       <title>Skiddiemonkeys</title>
       <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/>
+      <link href="{% static 'css/monkey-theme.css' %}" rel="stylesheet" media="screen"/>
    </head>
    <body>
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default monkey-bar">
 <div class="container-fluid">
 <div class="navbar-header">
 	<a class="navbar-brand" href="#">Skiddiemonkeys</a>
 </div>
 <div>
 <ul class="nav navbar-nav">
-<li class="active"><a href="/client">Client</a></li>
+<li class="active monkey-selected"><a href="/client">Client</a></li>
 <li><a href="/monkeys">Monkeys</a></li>
 <li><a href="/results">Results</a></li>
 </ul>
@@ -42,25 +43,6 @@
 
 </form>
 </div>
-<div id="runDiv" style="float:left; width:40%; margin-right:5%">
-<h3>Release Monkeys</h3>
-<form action="#" method="get">
-   <table>
-   <tbody>
-   <tr>
-   <th>
-      <label for="dur">Run For(minutes):</label>
-   </th>
-   <td>
-   <input id="dur" type="text" name="duration"  size="3"/>
-   </td>
-    </tr>
-   </tbody>
-   </table>
-   <input type="submit" value="GO!" name="btnStart"/>
-  
 
-</form>
-</div>
    </body>
 </html>
