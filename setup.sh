@@ -32,6 +32,10 @@ if  [ "$doIt" = "y" ] || [ "$doIt" = "Y" ]; then
 		pip install subprocess
 		pip install urllib2
 		pip install ssl
+		pip install django==1.7
+		pip install django-solo
+
+		 python ./manage.py migrate
 
 		echo "All done.  Check output for errors. Have fun!"
 
@@ -62,6 +66,11 @@ if  [ "$doIt" = "y" ] || [ "$doIt" = "Y" ]; then
 		    pip install subprocess
 		    pip install urllib2
 		    pip install ssl
+		    pip install django==1.7
+		    pip install django-solo
+
+		    python ./manage.py migrate
+
 
 			echo "All done.  Check output for errors. Have fun!"
 
@@ -90,6 +99,10 @@ if  [ "$doIt" = "y" ] || [ "$doIt" = "Y" ]; then
 		                pip install subprocess
 		                pip install urllib2
 		                pip install ssl
+		                pip install django==1.7
+		                pip install django-solo
+
+		                python ./manage.py migrate
 
 
 			echo "All done.	 Check output for errors. Have fun!"
