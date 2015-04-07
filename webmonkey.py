@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Skiddemonkeys Copyright 2014 Russell Butturini
+#Skiddemonkeys Copyright 2014 Russell Butturini and Joshua Tower
 #This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 #the Free Software Foundation, either version 3 of the License, or
