@@ -71,12 +71,12 @@ A comma separated target list in a text file will need to be provided.  The form
 <h3>Define Monkeys</h3>
 First, Skiddiemonkeys will ask how many monkeys to create.  For each created monkey, the following will need to be specified:
 - Monkey IQ Ranging from 0 to 3.  The lower the monkey IQ, the more likely it is to waste time on low value targets, or targets already attacked.
-- Monkey Type.  There are various types of bad actors (aka "monkeys") which can be defined:
-<i>Scan Monkey-</i>These monkeys are port scanners which will scan random targets in the provided CSV file.  One scan monkey is always required on a blank database to provide network facing service data to the other monkeys for them to attack.
-<i>Exploit Monkey-</i>These monkeys will launch random Metasploit exploits with random payloads based on open ports on a random target.
-<i>Fuzzy Monkey-</i>These monkeys will send random amounts of data within a specified range at random ports on a target.
-<i>Brute Monkey-</i>These monkeys will launch dictionary password attacks using common default credentials against SSH and FTP servers.
-<i>Web Monkey-</i>These monkeys will perform directory brute forcing against exposed web servers using common directory names.
+- Monkey Type.  There are various types of bad actors (aka "monkeys") which can be defined:<br>
+<i>Scan Monkey-</i>These monkeys are port scanners which will scan random targets in the provided CSV file.  One scan monkey is always required on a blank database to provide network facing service data to the other monkeys for them to attack.<br>
+<i>Exploit Monkey-</i>These monkeys will launch random Metasploit exploits with random payloads based on open ports on a random target.<br>
+<i>Fuzzy Monkey-</i>These monkeys will send random amounts of data within a specified range at random ports on a target.<br>
+<i>Brute Monkey-</i>These monkeys will launch dictionary password attacks using common default credentials against SSH and FTP servers.<br>
+<i>Web Monkey-</i>These monkeys will perform directory brute forcing against exposed web servers using common directory names.<br>
 
 - Monkey Location
 Specify the location of the monkey server.  This defines eligibility to attack targets based on the value associated with the target in the CSV file.
