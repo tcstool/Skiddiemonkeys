@@ -393,7 +393,6 @@ def monkeyReport():
     validTypes = [1, 2]
     print 'Select format for output:'
     print '1-CSV'
-    print '2-HTML'
     outType = int(raw_input('Input: '))
 
     if outType not in validTypes:
