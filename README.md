@@ -20,13 +20,13 @@ Required:
 -Reachability to TCP 27017 on the MongoDB host from both the clients and the servers.
 
 Other requirements vary based on the features in use:
-- To use automated random exploit attempts, Metasploit with a functional Postgres backend is required.
-- Various libraries required that a normal Python installation should have readily available. Your milage may vary, check the setup.sh script. 
+- To use automated random exploit attempts and payloads, Metasploit with a functional Postgres backend is required.
+- Various libraries required that a normal Python installation should have readily available for installation with pip or easyinstall. Your milage may vary, check the setup.sh script. 
  
 
 Setup
 ============
-``setup.sh``
+``setup.sh`` This is a helper script to manage installing some of the Python dependencies.
 
 Usage
 =====
@@ -40,23 +40,30 @@ To start the menu based CLI interface:
 ``python smclient.py``
 
 To start the web interface using the Django built in web server:
+``python manage.py runserver``
 
 
-NoSQLMap uses a menu based system for building attacks.  Upon starting NoSQLMap you are presented with with the main menu:
+The Skiddiemonkeys CLI interface uses a menu based system for building the simulation  Upon starting Skiddiemonkeys you are presented with with the main menu.  The meny is structured such that the options are presented in the order they need to be used for the application flow.
 
 ```
-1-Set options (do this first)
-2-NoSQL DB Access Attacks
-3-NoSQL Web App attacks
-4-Scan for Anonymous MongoDB Access
-x-Exit
+Skiddiemonkeys v0.1
+1-Set up the Database
+2-Load targets
+3-Define Monkeys
+4-Unleash the Monkeys!
+5-See the Monkey Business
+6-Exit
 ```
 
 
-Explanation of options:
+Explanation of menu items:
 ```
-1. Set target host/IP-The target web server (i.e. www.google.com) or MongoDB server you want to attack.
-2. Set web app port-TCP port for the web application if a web application is the target.
+<h3>Set up the database</h3>
+Set options to specify the IP of the MongoDB server and database parameters.  NOTE:  DO NOT USE 127.0.0.1 HERE.  
+This is the IP that will be transmitted to the servers to connect to as well.  If you are using Metasploit, this will also allow you to specify options to load the Metasploit exploit port mappings into MongoDB.
+
+<h3>Load Targets</h3>
+
 3. Set URI Path-The portion of the URI containing the page name and any parameters but NOT the host name (e.g. /app/acct.php?acctid=102).
 4. Set HTTP Request Method (GET/POST)-Set the request method to a GET or POST; Presently only GET is implemented but working on implementing POST requests exported from Burp. 
 5. Set my local Mongo/Shell IP-Set this option if attacking a MongoDB instance directly to the IP of a target Mongo installation to clone victim databases to or open Meterpreter shells to.
@@ -68,13 +75,6 @@ x. Back to main menu-Use this once the options are set to start your attacks.
 ```
 
 Once options are set head back to the main menu and select DB access attacks or web app attacks as appropriate for whether you are attacking a NoSQL management port or web application. The rest of the tool is "wizard" based and fairly self explanatory, but send emails to nosqlmap@gmail.com or find me on Twitter [@tcstoolHax0r](https://twitter.com/tcstoolHax0r) if you have any questions or suggestions. 
-
-Video
-=====
-
-NoSQLMap MongoDB Management Attack Demo.
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=xSFi-jxOBwM" target="_blank"><img src="http://img.youtube.com/vi/xSFi-jxOBwM/0.jpg" alt="NoSQLMap MongoDB Management Attack Demo" width="240" height="180" border="10" /></a> 
 
 Contribute
 ==========
