@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# skiddiemonkeys Copyright 2014 Russell Butturini
+# skiddiemonkeys Copyright 2014 Russell Butturini and Joshua Tower
 #This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 #the Free Software Foundation, either version 3 of the License, or
@@ -393,7 +393,6 @@ def monkeyReport():
     validTypes = [1, 2]
     print 'Select format for output:'
     print '1-CSV'
-    print '2-HTML'
     outType = int(raw_input('Input: '))
 
     if outType not in validTypes:
@@ -413,8 +412,11 @@ def monkeyReport():
                 if event['action'] == 'fuzz':
                     fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + str(event['port']) + ',' + str(event['bytes']) +'\n')
 
+                elif event['action'] != 'synscan'  and event['action'] != 'fuzz':
+                    fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + str(event['port']) + ',NA\n')
+
                 else:
-                    fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+',NA,NA\n')
+                     fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + 'NA,NA\n')
 
         raw_input('\nAll done! Press enter to return to the main menu.')
         return

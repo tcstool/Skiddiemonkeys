@@ -36,10 +36,28 @@
       {{ form.as_table }}
    </table>
 {% csrf_token %}
-<input type="submit" value="Save">
+<input type="submit" name="submit_Monkey" value="Save">
 {% if error  %}
 <h4>{{ error|get_error  }} </h4>
 {%  endif %}
+
+</form>
+</div>
+
+<div id="metaSettingsDiv" style="float:right; margin-right:5%; width:40%">
+<h3>Metasploit Settings</h3>
+{% if metaForm.errors %}
+	<p style="color: red;">
+		Please correct the error{{ metaForm.errors|pluralize }} below.
+	</p>
+{% endif %}
+
+<form action="" method="post" enctype="multipart/form-data">
+   <table>
+      {{ metaForm.as_table }}
+   </table>
+{% csrf_token %}
+<input type="submit" name="submit_Metasploit" value="Save">
 
 </form>
 </div>

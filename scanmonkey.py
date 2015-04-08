@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Skiddemonkeys Copyright 2014 Russell Butturini
+#Skiddemonkeys Copyright 2014 Russell Butturini and Joshua Tower
 #This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 #the Free Software Foundation, either version 3 of the License, or
@@ -82,5 +82,5 @@ def saveResults(target,openPorts,dbName,startTime,endTime,db,monkeyId,location):
     if hosts.find({'ip' : target}).count() == 0:  #If the IP already exists in the database skip recording duplicate data
         hosts.insert(data)
     
-    action.insert({'action':'synscan','ip':target,'start':startTime,'end':endTime,'id':monkeyId}) #Record all monkey activity, even if it's already occurred (i.e.Same target gets hit more than once)
+    action.insert({'action':'portscan','ip':target,'start':startTime,'end':endTime,'id':monkeyId}) #Record all monkey activity, even if it's already occurred (i.e.Same target gets hit more than once)
     
