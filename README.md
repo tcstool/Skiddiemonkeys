@@ -58,6 +58,7 @@ Explanation of menu items:
 <h3>Set up the database</h3>
 Set options to specify the IP of the MongoDB server and database parameters.  NOTE:  DO NOT USE 127.0.0.1 HERE.  This is the IP that will be transmitted to the servers to connect to as well.  
 If using Metasploit, this will also allow specification of options to load the Metasploit exploit port mappings into MongoDB.
+<b>The default installation of Postgres with Metasploit only binds to the loopback address.  You will need to use 127.0.0.1 if you have not configured postgres to allow remote connections.</b>
 
 <h3>Load Targets</h3>
 A comma separated target list in a text file will need to be provided.  The format is as follows:
