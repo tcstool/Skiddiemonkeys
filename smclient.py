@@ -299,7 +299,6 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
     if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
     count = 1
-
     for i in monkeyIQ:
         try:
             #generate random monkey identifier
@@ -322,9 +321,9 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
             print 'Monkey', count, 'Created!'
             count += 1
 
-        except:
+        except Exception,e:
             print 'Failed to create monkey in database.'
-
+            print str(e)
 
 def startMonkeys():
     global options

@@ -52,8 +52,9 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
             target = max(hostList,key=hostList.get)
             openPorts = db.hosts.find_one({'ip' : target})['ports']
             fuzzTCP = openPorts[randint(0,len(openPorts)-1)]
+            
             fuzzData = genFuzzData(randint(int(minData),int(maxData)))
-            print 'Fuzzy monkey got work! Fuzzing ' + target + ' on port ' + str(fuzzTCP) + ' with ' + str(getsizeof(fuzzData)) + ' bytes of data!'
+            print 'Fuzzy monkey got work! Fuzzing ' + target + ' on port ' + str(fuzzTCP) + ' with ' + str(getsizeof(fuzzData)-37) + ' bytes of data!'
             
             start = time.ctime()
 
@@ -71,7 +72,7 @@ def fuzzPorts(runTime,dbIp,dbName,monkeyIq,monkeyLoc,minData,maxData,monkeyId):
                 pass
 
             end = time.ctime()
-            saveResults(db,hosts,target,fuzzTCP,str(getsizeof(fuzzData)),start,end,monkeyId)
+            saveResults(db,hosts,target,fuzzTCP,str(getsizeof(fuzzData)-37),start,end,monkeyId)
             print 'Fuzzy monkey need sleep.  Resting for 5 seconds.'
             time.sleep(5)
 
@@ -83,3 +84,4 @@ def saveResults(dbConn,coll,target,port,size,startTime,endTime,monkeyId):
 
 def genFuzzData(fuzzLen):
         return ''.join(choice(string.ascii_letters + string.digits +'!@#$%^&*()') for x in range(fuzzLen) )
+
