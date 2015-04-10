@@ -61,8 +61,8 @@ def findLoginBoxes(runTime,dbIp,dbName,monkeyIq,monkeyLoc,monkeyId):
                     if 22 in openPorts:
                         ports.append(22)
 
-                    if 23 in openPorts:
-                        ports.append(23)
+                    #if 23 in openPorts:
+                    #    ports.append(23)
 
 
         if len(ports) == 0:

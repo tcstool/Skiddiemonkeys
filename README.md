@@ -79,6 +79,9 @@ First, Skiddiemonkeys will ask how many monkeys to create.  For each created mon
 <i>Brute Monkey-</i>These monkeys will launch dictionary password attacks using common default credentials against SSH and FTP servers.<br>
 <i>Web Monkey-</i>These monkeys will perform directory brute forcing against exposed web servers using common directory names.<br>
 
+Lists that the web and brute monkeys use are in the lists subfolder in the Github repository (weblist.txt for the web monkey, wordlist_ftp.txt and wordlist_ssh.txt for the brute force monkey).  These can be replaced with another list as long as they follow the username:password format for the brute forcer, and just a straight wordlist for web directories.
+
+
 - Monkey Location
 Specify the location of the monkey server.  This defines eligibility to attack targets based on the value associated with the target in the CSV file.
 
