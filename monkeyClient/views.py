@@ -79,7 +79,7 @@ def monkeyForm(request):
 				options['dbname']=dbInfo.Name
 				db=openMDB(options['dbip'],options['dbname'])
 				if db is not None:
-					smclient.loadMonkeys(options,db,[int(cd['iq'])],[int(cd['type'])],[cd['loc']],[cd['ip']],[cd['minbytes']],[cd['maxbytes']])
+					smclient.loadMonkeys(options,db,{0:int(cd['iq'])},{0:int(cd['type'])},{0:cd['loc']},{0:cd['ip']},{0:cd['minbytes']},{0:cd['maxbytes']})
 			except monkeyDBInfo.DoesNotExist:
 				#error
 				print 'monkey db info does not exist'
@@ -118,10 +118,10 @@ def resultsForm(request):
 					action['port']=event['port']
 					action['bytes']=event['bytes']
 				elif event['action']=='synscan':
-					action['port']='N/A'
+					action['port']=event['port']
 					action['bytes']='N/A'
 				else:
-					action['port']=event['port']
+					action['port']='N/A'
 					action['bytes']='N/A'
 				actions[count]=action
 				count=count+1
