@@ -117,11 +117,11 @@ def resultsForm(request):
 				if event['action']=='fuzz':
 					action['port']=event['port']
 					action['bytes']=event['bytes']
-				elif event['action']=='synscan':
-					action['port']=event['port']
+				elif event['action']=='portscan':
+					action['port']='N/A'
 					action['bytes']='N/A'
 				else:
-					action['port']='N/A'
+					action['port']=event['port']
 					action['bytes']='N/A'
 				actions[count]=action
 				count=count+1

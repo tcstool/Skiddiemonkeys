@@ -411,7 +411,7 @@ def monkeyReport():
                 if event['action'] == 'fuzz':
                     fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + str(event['port']) + ',' + str(event['bytes']) +'\n')
 
-                elif event['action'] != 'synscan'  and event['action'] != 'fuzz':
+                elif event['action'] != 'portscan'  and event['action'] != 'fuzz':
                     fo.write(str(event['action'])+','+ str(db.monkeys.find_one({'id' : event['id']})['ip']) +','+str(event['ip'])+','+str(event['start'])+','+str(event['end'])+ ',' + str(event['port']) + ',NA\n')
 
                 else:
