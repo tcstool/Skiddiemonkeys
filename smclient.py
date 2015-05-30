@@ -26,8 +26,10 @@ from helperFunctions import openMDB
 def main():
     global options
     global monkeyIds
+    global targetZones
     options = {}
     monkeyIds = []
+    targetZones = []
     options['CLI'] = 'true'
     mainMenu()
 
@@ -187,6 +189,8 @@ def loadTargetsParam(options, fileName, db):
             ipList = f.readlines()
 
     for target in ipList:
+        global targetZones
+        targetZones.append(target.split(',')[2].lower().rstrip() )
         db.targets.insert({'ip': target.split(',')[0], 'value': target.split(',')[1],
                            'location': target.split(',')[2].lower().rstrip()})
 
@@ -194,6 +198,8 @@ def loadTargetsParam(options, fileName, db):
 def makeMonkeys():
     global options
     global monkeyIds
+    global targetZones
+
     monkeyTypes = [None,'Scan Monkey',None,'Fuzzy Monkey',None,'Web Monkey']
     dropSel = True
     existing = []
@@ -237,11 +243,10 @@ def makeMonkeys():
     numMonkeys = int(raw_input('Enter total number of monkeys to create: '))
     validIQs = [0, 1, 2, 3]
     validTypes = [1, 2, 3, 4, 5]
-    validLocs = ['i', 'e']
 
     monkeyIQ = {}
     monkeyType = {}
-    monkeyLoc = {}
+    monkeyZones = {}
     monkeyIp = {}
     minFuzzSize = {}
     maxFuzzSize = {}
@@ -249,7 +254,7 @@ def makeMonkeys():
     for i in range(1, numMonkeys + 1):
         monkeyIQ[i] = None
         monkeyType[i] = None
-        monkeyLoc[i] = None
+        monkeyZones[i] = None
         print 'Setting up monkey #' + str(i)
 
         while monkeyIQ[i] not in validIQs:
@@ -272,13 +277,30 @@ def makeMonkeys():
             print '5-Web Monkey'
             monkeyType[i] = int(raw_input('Input: '))
 
-        print "\n"
+        print '\n'
+        print 'Define Monkey Zones:'
+        zones = []
+        zoneSel = None
 
-        while monkeyLoc[i] not in validLocs:
-            print 'Define Monkey Location:'
-            print 'i-Internal'
-            print 'e-External'
-            monkeyLoc[i] = raw_input('Input: ').lower()
+        while zoneSel != 'q':
+            menuItem = 1
+
+            for zoneName in targetZones:
+                print str(menuItem) + '-' + zoneName
+                menuItem +=1
+
+            zoneSel = raw_input('Add a zone for a monkey to attack or q to quit: ')
+            print '\n'
+
+            try:
+                if zoneSel != 'q':
+                    zones.append( targetZones[int(zoneSel)-1] )
+                else:
+                    monkeyZones[i] = zones
+
+            except:
+                print 'Invalid input\n'
+                pass
 
         monkeyIp[i] = raw_input('Enter IP address of monkey server: ')
 
@@ -287,14 +309,14 @@ def makeMonkeys():
             minFuzzSize[i] = int(raw_input('Enter the minimum number of bytes of fuzz data to send: '))
             maxFuzzSize[i] = int(raw_input('Enter the maximum number of bytes of fuzz data to send: '))
 
-    loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize)
+    loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyZones, monkeyIp, minFuzzSize, maxFuzzSize)
     raw_input('Finished making monkeys.  Press enter to return to the main menu.')
     return
 
 
-def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzSize, maxFuzzSize):
+def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyZones, monkeyIp, minFuzzSize, maxFuzzSize):
     randId = 1
-    monkeyIds=list(db.monkeys.distinct("id"))
+    monkeyIds=list(db.monkeys.distinct('id'))
     #Get in that barrel!
     if options['CLI'] == 'false' and options['eraseMonkeyData'] == 'true':
         db['monkeys'].drop()
@@ -309,12 +331,12 @@ def loadMonkeys(options, db, monkeyIQ, monkeyType, monkeyLoc, monkeyIp, minFuzzS
 
             if monkeyType[i] == 3:
                 db.monkeys.insert(
-                    {'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i], 'ip': monkeyIp[i],
+                    {'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'zones': monkeyZones[i], 'ip': monkeyIp[i],
                      'min': minFuzzSize[i], 'max': maxFuzzSize[i]})
                 randId = 1
 
             else:
-                db.monkeys.insert({'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'location': monkeyLoc[i],
+                db.monkeys.insert({'id': randId, 'iq': monkeyIQ[i], 'type': monkeyType[i], 'zones': monkeyZones[i],
                                    'ip': monkeyIp[i]})
                 randId = 1
 
